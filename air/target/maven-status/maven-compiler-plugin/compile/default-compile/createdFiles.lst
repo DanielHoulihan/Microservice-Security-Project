@@ -1,5 +1,3 @@
 air/Application.class
 air/AirService.class
 air/AirService$NoSuchQuotationException.class
-air/AirOrder.class
-air/AirOrder$NoSuchQuotationException.class
