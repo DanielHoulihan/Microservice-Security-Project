@@ -24,7 +24,7 @@ public class QuotationBroker {
 
         quotations.add(restTemplate.postForObject("http://localhost:8080/quotations", request, Quotation.class));
         quotations.add(restTemplate.postForObject("http://localhost:8081/quotations", request, Quotation.class));
-
+        quotations.add(restTemplate.postForObject("http://localhost:8082/quotations", request, Quotation.class));
 
         ClientApplication clientApplication = new ClientApplication(clientNumber, info, quotations);
         map.put(clientNumber, clientApplication);
