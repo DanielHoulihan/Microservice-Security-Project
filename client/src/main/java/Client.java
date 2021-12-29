@@ -16,6 +16,8 @@ public class Client {
 
     public static void main(String[] args) {
 
+
+        // getting a quote
         RestTemplate restTemplate = new RestTemplate();
         for (ClientInfo clientInfo : clients){
             HttpEntity<ClientInfo> request = new HttpEntity<>(clientInfo);
@@ -38,11 +40,19 @@ public class Client {
             }
         }
 
-        System.out.println("Which would you like to order? Enter the quotation reference");
 
+        //ordering
+        System.out.println("Which would you like to order? Enter the quotation reference");
         Scanner sc = new Scanner(System.in);
         String i = sc.nextLine();
-        System.out.println("input-> " + i); // will print the variable
+        System.out.println("input-> " + i);
+
+
+        // tracking
+        System.out.println("Enter your tracking number");
+        Scanner sc2 = new Scanner(System.in);
+        String i2 = sc.nextLine();
+        System.out.println("input-> " + i2);
     }
 }
 
