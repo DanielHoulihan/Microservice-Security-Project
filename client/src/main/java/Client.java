@@ -4,6 +4,8 @@ import info.ClientApplication;
 import info.ClientInfo;
 import info.Quotation;
 
+import java.util.Scanner;
+
 public class Client {
 
     public static final ClientInfo[] clients = {
@@ -22,7 +24,6 @@ public class Client {
             System.out.println("Urgency -> " + clientInfo.getUrgency());
             System.out.println("Location -> " + clientInfo.getLocation());
 
-
             for (Quotation quotation : clientApplication.getQuotations()){
                 System.out.println("***Quotation***");
                 if (!quotation.getPossible()) {
@@ -36,6 +37,12 @@ public class Client {
                 }
             }
         }
+
+        System.out.println("Which would you like to order? Enter the quotation reference");
+
+        Scanner sc = new Scanner(System.in);
+        String i = sc.nextLine();
+        System.out.println("input-> " + i); // will print the variable
     }
 }
 

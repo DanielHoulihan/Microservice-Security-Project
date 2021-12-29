@@ -15,7 +15,6 @@
     <module>ground</module>
     <module>tracking</module>
     <module>ordering</module>
-    <module>router</module>
 </modules>
 
 <properties>
