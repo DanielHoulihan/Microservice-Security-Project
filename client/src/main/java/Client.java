@@ -14,7 +14,6 @@ public class Client {
 
     public static void main(String[] args) {
 
-
         // getting a quote
         RestTemplate restTemplate = new RestTemplate();
         for (ClientInfo clientInfo : clients){
@@ -40,7 +39,7 @@ public class Client {
 
 
         //ordering
-        Quotation quote1 = new Quotation("Navy Seals", "test1", 1000, true);
+        Quotation quote1 = new Quotation("Army", "test1", 1000, true);
         HttpEntity<Quotation> request2 = new HttpEntity<>(quote1);
         OrderApplication orderApplication = restTemplate.postForObject("http://localhost:8084/applications", request2, OrderApplication.class);
 
@@ -49,6 +48,9 @@ public class Client {
             System.out.println("reference -> " + order.getReference());
             System.out.println("tracking number -> " + order.getTrackingNumber());
         }
+
+
+
         // tracking
 
     }

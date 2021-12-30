@@ -13,10 +13,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 public class GroundService {
-    public static final String PREFIX = "Ground";
+    public static final String PREFIX = "GRD";
     public static final String COMPANY = "Army";
 
     public Quotation generateQuotation(ClientInfo info) {
@@ -32,11 +33,11 @@ public class GroundService {
         if (!info.getLocation().equals("GROUND")){
             possible = false;
         }
-        return new Quotation(COMPANY, generateReference(), (price + urgency_charge), possible);
+        return new Quotation(COMPANY, generateQuotationReference(), (price + urgency_charge), possible);
     }
 
     int counter = 0;
-    protected String generateReference() {
+    protected String generateQuotationReference() {
         String ref = GroundService.PREFIX;
         int length = 100000;
         while (length > 1000) {
@@ -72,9 +73,30 @@ public class GroundService {
     public class NoSuchQuotationException extends RuntimeException {
         static final long serialVersionUID = -6516152229878843037L; }
 
+    protected String generateOrderReference() {
+        String ref = GroundService.PREFIX;
+        ref += UUID.randomUUID().toString();
+        return ref;
+    }
+
+    int count2 = 0;
+    protected String generateTrackingNumber() {
+        String ref = "TR";
+
+        StringBuilder s = new StringBuilder("AAAAAA");
+        for (int pos = 6; pos >= 0 && count2 > 0 ; pos--) {
+            char digit = (char) ('a' + count2 % 26);
+            s.setCharAt(pos, digit);
+            count2 = count2 / 26;
+        }
+
+        ref += s;
+        count2+=1;
+        return ref;
+    }
 
     protected Order generateOrder(ClientInfo info, Quotation quote) {
-        return new Order("order1", "XSGBER42525", 1000);
+        return new Order(generateOrderReference(), generateTrackingNumber(), quote.getPrice());
     }
 
     private Map<String, Order> orders = new HashMap<>();

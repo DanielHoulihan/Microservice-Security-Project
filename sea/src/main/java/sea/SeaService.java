@@ -13,6 +13,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 public class SeaService {
@@ -73,8 +74,30 @@ public class SeaService {
         static final long serialVersionUID = -6516152229878843037L; }
 
 
+    protected String generateOrderReference() {
+        String ref = SeaService.PREFIX;
+        ref += UUID.randomUUID().toString();
+        return ref;
+    }
+
+    int count2 = 0;
+    protected String generateTrackingNumber() {
+        String ref = "TR";
+
+        StringBuilder s = new StringBuilder("AAAAAA");
+        for (int pos = 6; pos >= 0 && count2 > 0 ; pos--) {
+            char digit = (char) ('a' + count2 % 26);
+            s.setCharAt(pos, digit);
+            count2 = count2 / 26;
+        }
+
+        ref += s;
+        count2+=1;
+        return ref;
+    }
+
     protected Order generateOrder(ClientInfo info, Quotation quote) {
-        return new Order("order1", "XSGBER42525", 1000);
+        return new Order(generateOrderReference(), generateTrackingNumber(), quote.getPrice());
     }
 
     private Map<String, Order> orders = new HashMap<>();
