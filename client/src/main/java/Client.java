@@ -23,21 +23,27 @@ public class Client {
             Scanner sc = new Scanner(System.in);
             System.out.println("Enter your name: ");
             name = sc.nextLine();
-            System.out.println("Enter the urgency which the job requires: ");
+            System.out.println("Enter the urgency which the job requires (ASAP/SOON): ");
             urgency = sc.nextLine();
-            System.out.println("Enter the location which the job requires: ");
+            System.out.println("Enter the location which the job requires (AIR/SEA/LAND): ");
             location = sc.nextLine();
 
             System.out.println("\nThe details you entered are:\n");
-            System.out.println("Name: " + name + "\n");
-            System.out.println("Urgency: " + urgency + "\n");
-            System.out.println("Location: " + location + "\n");
-            System.out.println("Are you satisfied with the details entered? (Y) or (N).");
-            output = sc.nextLine();
-
+            System.out.println("Name: " + name);
+            System.out.println("Urgency: " + urgency);
+            System.out.println("Location: " + location);
+            if((urgency.equals("ASAP") || urgency.equals("SOON")) && (location.equals("AIR") || location.equals("SEA") || location.equals("LAND"))) {
+                System.out.println("\nAre you satisfied with the details entered? (Y) or (N).");
+                output = sc.nextLine();
+            } else {
+                output = "N";
+                System.out.println("\n*** One or more of the inputs given where wrong, try again please. ***\n");
+            }
         } while(output.equalsIgnoreCase("N"));
 
         ClientInfo[] clients = {new ClientInfo(name, urgency, location)};
+
+        displayLogo();
 
         // getting a quote
         RestTemplate restTemplate = new RestTemplate();
@@ -98,6 +104,15 @@ public class Client {
         System.out.println("\n\n|=================================================================================================================|");
         System.out.println("|                                    No Quotation Available from: " + String.format("%1$-48s", quotation.getCompany()) + "|");
         System.out.println("|=================================================================================================================|");
+    }
+
+    public static void displayLogo() {
+        System.out.println("\n\n ______      ______    ____    ____  ");
+        System.out.println("|_   _ `.  .' ____ \\  |_   \\  /   _| ");
+        System.out.println("  | | `. \\ | (___ \\_|   |   \\/   |   ");
+        System.out.println("  | |  | |  _.____`.    | |\\  /| |   ");
+        System.out.println(" _| |_.' / | \\____) |  _| |_\\/_| |_  ");
+        System.out.println("|______.'   \\______.' |_____||_____| \n\n");
     }
 }
 
