@@ -3,7 +3,9 @@ import org.springframework.http.HttpEntity;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.Scanner;
+import java.util.TreeMap;
 
 public class Client {
 
@@ -12,6 +14,9 @@ public class Client {
 //            new ClientInfo("Shane", "SOON", "SEA"),
 //            new ClientInfo("Daniel", "WHENEVER", "AIR"),
 //    };
+
+    private static TreeMap<Integer, Quotation> cache = new TreeMap<Integer, Quotation>();
+    private static int index = 1;
 
     public static void main(String[] args) {
 
@@ -57,20 +62,29 @@ public class Client {
                     displayNoQuotation(quotation);
                 }
                 else {
+                    System.out.println("\n\n                                                        |===|");
+                    System.out.println("                                                        | " + index + " |");
+                    System.out.println("                                                        |===|");
                     displayQuotation(quotation);
+                    cache.put(index, quotation);
+                    index++;
                 }
             }
         }
 
+        int chosenOrder;
+        Scanner sc = new Scanner(System.in);
+        System.out.println();
+        System.out.println("\nEnter the quotation which you would like to order (E.g 1/2/3): ");
+        chosenOrder = sc.nextInt();
+
         //ordering
-        Quotation quote1 = new Quotation("Army", "test1", 1000, true);
+        Quotation quote1 = cache.get(chosenOrder);
         HttpEntity<Quotation> request2 = new HttpEntity<>(quote1);
         OrderApplication orderApplication = restTemplate.postForObject("http://localhost:8084/applications", request2, OrderApplication.class);
 
         for (Order order : orderApplication.getOrders()) {
-            System.out.println("price - > " + order.getPrice());
-            System.out.println("reference -> " + order.getReference());
-            System.out.println("tracking number -> " + order.getTrackingNumber());
+            displayOrder(order);
         }
         // tracking
     }
@@ -89,7 +103,7 @@ public class Client {
     }
 
     public static void displayQuotation(Quotation quotation) {
-        System.out.println("\n\n|=================================================================================================================|");
+        System.out.println("|=================================================================================================================|");
         System.out.println("|                                    Distributed Security Management Quotation                                    |");
         System.out.println("|=================================================================================================================|");
         System.out.println("|                                     |                                     |                                     |");
@@ -102,7 +116,19 @@ public class Client {
 
     public static void displayNoQuotation(Quotation quotation) {
         System.out.println("\n\n|=================================================================================================================|");
-        System.out.println("|                                    No Quotation Available from: " + String.format("%1$-48s", quotation.getCompany()) + "|");
+        System.out.println("|                                       No Quotation Available from: " + String.format("%1$-45s", quotation.getCompany()) + "|");
+        System.out.println("|=================================================================================================================|");
+    }
+
+    public static void displayOrder(Order order) {
+        System.out.println("\n\n|=================================================================================================================|");
+        System.out.println("|                                Distributed Security Management Order Reference                                  |");
+        System.out.println("|=================================================================================================================|");
+        System.out.println("|                           |                                                    |                                |");
+        System.out.println(
+                "| Price: " + String.format("%1$-18s", NumberFormat.getCurrencyInstance().format(order.getPrice())) +
+                        " | Reference: " + String.format("%1$-30s", order.getReference()) +
+                        " | Tracking Number: " + String.format("%1$-13s", order.getTrackingNumber())+" |");
         System.out.println("|=================================================================================================================|");
     }
 
