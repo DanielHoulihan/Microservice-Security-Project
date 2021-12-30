@@ -1,8 +1,6 @@
+import info.*;
 import org.springframework.http.HttpEntity;
 import org.springframework.web.client.RestTemplate;
-import info.ClientApplication;
-import info.ClientInfo;
-import info.Quotation;
 
 import java.util.Scanner;
 
@@ -42,17 +40,17 @@ public class Client {
 
 
         //ordering
-        System.out.println("Which would you like to order? Enter the quotation reference");
-        Scanner sc = new Scanner(System.in);
-        String i = sc.nextLine();
-        System.out.println("input-> " + i);
+        Quotation quote1 = new Quotation("Army", "test1", 1000, true);
+        HttpEntity<Quotation> request2 = new HttpEntity<>(quote1);
+        OrderApplication orderApplication = restTemplate.postForObject("http://localhost:8084/applications", request2, OrderApplication.class);
 
-
+        for (Order order : orderApplication.getOrders()) {
+            System.out.println("price - > " + order.getPrice());
+            System.out.println("reference -> " + order.getReference());
+            System.out.println("tracking number -> " + order.getTrackingNumber());
+        }
         // tracking
-        System.out.println("Enter your tracking number");
-        Scanner sc2 = new Scanner(System.in);
-        String i2 = sc.nextLine();
-        System.out.println("input-> " + i2);
+
     }
 }
 
