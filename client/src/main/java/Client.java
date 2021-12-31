@@ -9,6 +9,9 @@ import java.util.TreeMap;
 
 public class Client {
 
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_RESET = "\u001B[0m";
+
 //    public static final ClientInfo[] clients = {
 //            new ClientInfo("Daniel", "ASAP", "AIR"),
 //            new ClientInfo("Shane", "SOON", "SEA"),
@@ -47,7 +50,6 @@ public class Client {
         } while(output.equalsIgnoreCase("N"));
 
         ClientInfo[] clients = {new ClientInfo(name, urgency, location)};
-
         displayLogo();
 
         // getting a quote
@@ -72,13 +74,12 @@ public class Client {
             }
         }
 
+        //ordering
         int chosenOrder;
         Scanner sc = new Scanner(System.in);
-        System.out.println();
         System.out.println("\nEnter the quotation which you would like to order (E.g 1/2/3): ");
         chosenOrder = sc.nextInt();
 
-        //ordering
         Quotation quote1 = cache.get(chosenOrder);
         HttpEntity<Quotation> request2 = new HttpEntity<>(quote1);
         OrderApplication orderApplication = restTemplate.postForObject("http://localhost:8084/applications", request2, OrderApplication.class);
@@ -133,12 +134,12 @@ public class Client {
     }
 
     public static void displayLogo() {
-        System.out.println("\n\n ______      ______    ____    ____  ");
-        System.out.println("|_   _ `.  .' ____ \\  |_   \\  /   _| ");
-        System.out.println("  | | `. \\ | (___ \\_|   |   \\/   |   ");
-        System.out.println("  | |  | |  _.____`.    | |\\  /| |   ");
-        System.out.println(" _| |_.' / | \\____) |  _| |_\\/_| |_  ");
-        System.out.println("|______.'   \\______.' |_____||_____| \n\n");
+        System.out.println(ANSI_YELLOW + "\n\n ______      ______    ____    ____  " + ANSI_RESET);
+        System.out.println(ANSI_YELLOW + "|_   _ `.  .' ____ \\  |_   \\  /   _| " + ANSI_RESET);
+        System.out.println(ANSI_YELLOW + "  | | `. \\ | (___ \\_|   |   \\/   |   " + ANSI_RESET);
+        System.out.println(ANSI_YELLOW + "  | |  | |  _.____`.    | |\\  /| |   " + ANSI_RESET);
+        System.out.println(ANSI_YELLOW + " _| |_.' / | \\____) |  _| |_\\/_| |_  " + ANSI_RESET);
+        System.out.println(ANSI_YELLOW + "|______.'   \\______.' |_____||_____| \n\n" + ANSI_RESET);
     }
 }
 
