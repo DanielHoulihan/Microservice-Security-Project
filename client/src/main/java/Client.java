@@ -35,28 +35,29 @@ public class Client {
             Scanner sc = new Scanner(System.in);
             String input = sc.nextLine().toUpperCase();
 
-            if(input.equals("CREATE")){
-                createUser();
-            }
-
             if(clients.isEmpty()) {
                 System.out.println("No users exist, you must create one");
                 createUser();
             }
 
+            if(input.equals("TRACK")){
+                getTracking();
+            }
+
+            if(input.equals("CREATE")){
+                createUser();
+            }
+
+            if(input.equals("ORDER") && !clients.isEmpty()){
+                System.out.println("which user are you? Please give the ID");
+                int user = sc.nextInt();
+                getQuotes(clients.get(user));
+                order(clients.get(user));
+            }
+
             for (ClientInfo clientInfo : clients) {
                 displayProfile(clientInfo);
             }
-
-            System.out.println("which user are you? Please give the ID");
-            int user = sc.nextInt();
-            getQuotes(clients.get(user));
-            order(clients.get(user));
-
-
-            getTracking();
-
-
 
         }
 
