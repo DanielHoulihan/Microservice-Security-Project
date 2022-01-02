@@ -2,12 +2,8 @@ import info.*;
 import org.springframework.http.HttpEntity;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Scanner;
 import java.util.TreeMap;
 
@@ -15,13 +11,8 @@ public class Client {
 
     private static final String ANSI_YELLOW = "\u001B[33m";
     private static final String ANSI_RESET = "\u001B[0m";
-
     private static final ArrayList<ClientInfo> clients = new ArrayList<>();
-
     private static final TreeMap<Integer, Quotation> cache = new TreeMap<Integer, Quotation>();
-    private static final TreeMap<Integer, Order> orderCache = new TreeMap<Integer, Order>();
-
-//    private static int index = 1;
 
     public static void main(String[] args) {
 
@@ -49,13 +40,19 @@ public class Client {
             }
 
             if(input.equals("ORDER") && !clients.isEmpty()){
-                System.out.println("which user are you? Please give the ID");
-                int user = sc.nextInt();
-                getQuotes(clients.get(user));
-                order(clients.get(user));
+                System.out.println("Which user would you like to order as? Give the name");
+                String user = sc.nextLine().toUpperCase();
+                for(ClientInfo client : clients) {
+                    if(client.getName().equals(user)) {
+                        getQuotes(client);
+                    }
+                }
+                order();
             }
 
             for (ClientInfo clientInfo : clients) {
+                System.out.println("|=================================================================================================================|");
+                System.out.println("|                                  Distributed Security Management Client Profiles                                |");
                 displayProfile(clientInfo);
             }
 
@@ -102,6 +99,7 @@ public class Client {
         ClientApplication clientApplication = restTemplate.postForObject("http://localhost:8083/applications", request, ClientApplication.class);
         displayProfile(client);
 
+        assert clientApplication != null;
         for (Quotation quotation : clientApplication.getQuotations()) {
             if (!quotation.getPossible()) {
                 displayNoQuotation(quotation);
@@ -124,17 +122,20 @@ public class Client {
 
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> request = new HttpEntity<>(trackingNumber);
-        TrackingInfo trackingInfo = restTemplate.postForObject("http://localhost:8085/applications", request, TrackingInfo.class);
-        displayTracking(trackingInfo);
+        TrackingApplication trackingApplication = restTemplate.postForObject("http://localhost:8085/applications", request, TrackingApplication.class);
+        assert trackingApplication != null;
 
-        System.out.println(trackingInfo.getTrackingNumber());
-        System.out.println(trackingInfo.getDistance());
-        System.out.println(trackingInfo.getTimeRemaining());
-        System.out.println(trackingInfo);
+        for (TrackingInfo tracking : trackingApplication.getTracking()) {
+            if(tracking.getTrackingNumber()!=null) {
+                displayTracking(tracking);
+            }
+        }
+
+
     }
 
 
-    public static void order(ClientInfo info) {
+    public static void order() {
 
         RestTemplate restTemplate = new RestTemplate();
         Scanner sc = new Scanner(System.in);
@@ -145,6 +146,7 @@ public class Client {
         HttpEntity<Quotation> request2 = new HttpEntity<>(quote1);
         OrderApplication orderApplication = restTemplate.postForObject("http://localhost:8084/applications", request2, OrderApplication.class);
 
+        assert orderApplication != null;
         for (Order order : orderApplication.getOrders()) {
             displayOrder(order);
         }
@@ -152,7 +154,7 @@ public class Client {
 
     public static void displayTracking(TrackingInfo info) {
         System.out.println("\n\n|=================================================================================================================|");
-        System.out.println("|                                  Distributed Security Management Client Profile                                 |");
+        System.out.println("|                                                 TRACKING                                                        |");
         System.out.println("|=================================================================================================================|");
         System.out.println("|                                     |                                     |                                     |");
         System.out.println("| distance: " + info.getDistance() + " | number: " + info.getTrackingNumber() + " | time remaining: "+ info.getTimeRemaining());
@@ -162,8 +164,7 @@ public class Client {
 
 
     public static void displayProfile(ClientInfo info) {
-        System.out.println("\n\n|=================================================================================================================|");
-        System.out.println("|                                  Distributed Security Management Client Profile                                 |");
+
         System.out.println("|=================================================================================================================|");
         System.out.println("|                                     |                                     |                                     |");
         System.out.println(
@@ -201,7 +202,7 @@ public class Client {
                 "| Price: " + String.format("%1$-18s", NumberFormat.getCurrencyInstance().format(order.getPrice())) +
                         " | Reference: " + String.format("%1$-30s", order.getReference()) +
                         " | Tracking Number: " + String.format("%1$-13s", order.getTrackingNumber())+" |");
-        System.out.println("|=================================================================================================================|");
+        System.out.println("|=================================================================================================================|\n\n");
     }
 
     public static void displayLogo() {

@@ -12,14 +12,17 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 public class AirService {
     public static final String PREFIX = "AIR";
     public static final String COMPANY = "Royal Air Force";
+    private final ArrayList<TrackingInfo> trackings = new ArrayList<>();
+
 
     public Quotation generateQuotation(ClientInfo info) {
         boolean possible = true;
@@ -64,12 +67,15 @@ public class AirService {
     @RequestMapping(value="/quotations/{reference}",method=RequestMethod.GET)
     public Quotation getResource(@PathVariable("reference") String reference) {
         Quotation quotation = quotations.get(reference);
-        if (quotation == null) throw new NoSuchQuotationException(); return quotation;
+        if (quotation == null) throw new NoSuchQuotationException();
+        return quotation;
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public class NoSuchQuotationException extends RuntimeException {
-        static final long serialVersionUID = -6516152229878843037L; }
+    public static class NoSuchQuotationException extends RuntimeException {
+        static final long serialVersionUID = -6516152229878843037L;
+    }
+
 
 
     protected String generateOrderReference() {
@@ -90,13 +96,22 @@ public class AirService {
         return ref + count2++;
     }
 
-    protected Order generateOrder(ClientInfo info, Quotation quote) {
-        return new Order(generateOrderReference(), generateTrackingNumber(), quote.getPrice());
+    protected Order generateOrder(ClientInfo info, Quotation quote) throws InterruptedException {
+        String trackingNumber = generateTrackingNumber();
+        startTracking(trackingNumber);
+        return new Order(generateOrderReference(), trackingNumber, quote.getPrice());
     }
+
+    int time = 100;
+    int distance = 200;
+    protected void startTracking(String trackingNumber) {
+        trackings.add(new TrackingInfo(trackingNumber, distance, time));
+    }
+
 
     private Map<String, Order> orders = new HashMap<>();
     @RequestMapping(value="/ordering",method= RequestMethod.POST)
-    public ResponseEntity<Order> createOrder(@RequestBody Quotation quote, ClientInfo info){
+    public ResponseEntity<Order> createOrder(@RequestBody Quotation quote, ClientInfo info) throws InterruptedException {
         Order order = generateOrder(info, quote);
         orders.put(order.getReference(), order);
         String path = ServletUriComponentsBuilder.fromCurrentContextPath().
@@ -112,7 +127,15 @@ public class AirService {
 
     @RequestMapping(value="/tracking",method= RequestMethod.POST)
     public ResponseEntity<TrackingInfo> getTrackingInfo(@RequestBody String trackingNumber){
-        TrackingInfo info = new TrackingInfo("air", 5, 5);
+
+        TrackingInfo infoToReturn = new TrackingInfo();
+        for(TrackingInfo info : trackings) {
+            if(info.getTrackingNumber().equals(trackingNumber)) {
+                infoToReturn=info;
+            }
+        }
+
+        TrackingInfo info = new TrackingInfo(trackingNumber, distance, time);
         String path = ServletUriComponentsBuilder.fromCurrentContextPath().
                 build().toUriString()+ "/tracking/"+info.getTrackingNumber();
         HttpHeaders headers = new HttpHeaders();
@@ -121,7 +144,7 @@ public class AirService {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        return new ResponseEntity<>(info, headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(infoToReturn, headers, HttpStatus.CREATED);
     }
 
 

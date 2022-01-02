@@ -12,6 +12,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -20,6 +21,8 @@ import java.util.UUID;
 public class GroundService {
     public static final String PREFIX = "GRD";
     public static final String COMPANY = "Army";
+    private final ArrayList<TrackingInfo> trackings = new ArrayList<>();
+
 
     public Quotation generateQuotation(ClientInfo info) {
         boolean possible = true;
@@ -92,13 +95,9 @@ public class GroundService {
         return ref + count2++;
     }
 
-    protected Order generateOrder(ClientInfo info, Quotation quote) {
-        return new Order(generateOrderReference(), generateTrackingNumber(), quote.getPrice());
-    }
-
     private Map<String, Order> orders = new HashMap<>();
     @RequestMapping(value="/ordering",method= RequestMethod.POST)
-    public ResponseEntity<Order> createOrder(@RequestBody Quotation quote, ClientInfo info){
+    public ResponseEntity<Order> createOrder(@RequestBody Quotation quote, ClientInfo info) {
         Order order = generateOrder(info, quote);
         orders.put(order.getReference(), order);
         String path = ServletUriComponentsBuilder.fromCurrentContextPath().
@@ -112,9 +111,30 @@ public class GroundService {
     }
 
 
+    protected Order generateOrder(ClientInfo info, Quotation quote) {
+        String trackingNumber = generateTrackingNumber();
+        startTracking(trackingNumber);
+        return new Order(generateOrderReference(), trackingNumber, quote.getPrice());
+    }
+
+    int time = 100;
+    int distance = 200;
+    protected void startTracking(String trackingNumber) {
+        trackings.add(new TrackingInfo(trackingNumber, distance, time));
+    }
+
+
     @RequestMapping(value="/tracking",method= RequestMethod.POST)
     public ResponseEntity<TrackingInfo> getTrackingInfo(@RequestBody String trackingNumber){
-        TrackingInfo info = new TrackingInfo("ground", 5, 5);
+
+        TrackingInfo infoToReturn = new TrackingInfo();
+        for(TrackingInfo info : trackings) {
+            if(info.getTrackingNumber().equals(trackingNumber)) {
+                infoToReturn=info;
+            }
+        }
+
+        TrackingInfo info = new TrackingInfo(trackingNumber, distance, time);
         String path = ServletUriComponentsBuilder.fromCurrentContextPath().
                 build().toUriString()+ "/tracking/"+info.getTrackingNumber();
         HttpHeaders headers = new HttpHeaders();
@@ -123,8 +143,7 @@ public class GroundService {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        return new ResponseEntity<>(info, headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(infoToReturn, headers, HttpStatus.CREATED);
     }
-
 
 }

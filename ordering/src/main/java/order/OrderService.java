@@ -36,12 +36,12 @@ public class OrderService {
     }
 
     @RequestMapping(value="applications/{clientNumber}",method=RequestMethod.GET)
-    public OrderApplication getResource() {
+    public OrderApplication getResourceOrdering() {
         if (map == null) throw new NoSuchOrderException(); return map.get(clientNumber);
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public class NoSuchOrderException extends RuntimeException {
+    public static class NoSuchOrderException extends RuntimeException {
         static final long serialVersionUID = -6516152229878843037L;
     }
 
