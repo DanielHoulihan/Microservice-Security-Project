@@ -3,6 +3,7 @@ package ground;
 import info.ClientInfo;
 import info.Order;
 import info.Quotation;
+import info.TrackingInfo;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class GroundService {
         else if (info.getUrgency().equals("SOON")){
             urgency_charge = 2000;
         }
-        if (!info.getLocation().equals("GROUND")){
+        if (!info.getLocation().equals("LAND")){
             possible = false;
         }
         return new Quotation(COMPANY, generateQuotationReference(), (price + urgency_charge), possible);
@@ -81,18 +82,14 @@ public class GroundService {
 
     int count2 = 0;
     protected String generateTrackingNumber() {
-        String ref = "TR";
-
-        StringBuilder s = new StringBuilder("AAAAAA");
-        for (int pos = 6; pos >= 0 && count2 > 0 ; pos--) {
-            char digit = (char) ('a' + count2 % 26);
-            s.setCharAt(pos, digit);
-            count2 = count2 / 26;
+        String ref = GroundService.PREFIX;
+        ref+="TRACK";
+        int length = 333333333;
+        while (length > 1000) {
+            if (count2 / length == 0) ref += "0";
+            length = length / 10;
         }
-
-        ref += s;
-        count2+=1;
-        return ref;
+        return ref + count2++;
     }
 
     protected Order generateOrder(ClientInfo info, Quotation quote) {
@@ -114,6 +111,20 @@ public class GroundService {
         return new ResponseEntity<>(order, headers, HttpStatus.CREATED);
     }
 
+
+    @RequestMapping(value="/tracking",method= RequestMethod.POST)
+    public ResponseEntity<TrackingInfo> getTrackingInfo(@RequestBody String trackingNumber){
+        TrackingInfo info = new TrackingInfo("ground", 5, 5);
+        String path = ServletUriComponentsBuilder.fromCurrentContextPath().
+                build().toUriString()+ "/tracking/"+info.getTrackingNumber();
+        HttpHeaders headers = new HttpHeaders();
+        try {
+            headers.setLocation(new URI(path));
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(info, headers, HttpStatus.CREATED);
+    }
 
 
 }

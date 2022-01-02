@@ -1,5 +1,7 @@
-info/ClientApplication.class
 info/ClientInfo.class
-info/Order.class
 info/OrderApplication.class
 info/Quotation.class
+info/ClientApplication.class
+info/TrackingInfo.class
+info/TrackingApplication.class
+info/Order.class

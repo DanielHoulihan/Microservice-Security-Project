@@ -37,11 +37,11 @@ public class OrderService {
 
     @RequestMapping(value="applications/{clientNumber}",method=RequestMethod.GET)
     public OrderApplication getResource() {
-        if (map == null) throw new NoSuchQuotationException(); return map.get(clientNumber);
+        if (map == null) throw new NoSuchOrderException(); return map.get(clientNumber);
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public class NoSuchQuotationException extends RuntimeException {
+    public class NoSuchOrderException extends RuntimeException {
         static final long serialVersionUID = -6516152229878843037L;
     }
 

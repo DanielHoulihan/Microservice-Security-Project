@@ -12,7 +12,7 @@
     <artifactId>sea</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>sea</name>
-    <description>quoco rest project for Spring Boot</description>
+    <description>sea service</description>
 
     <properties>
         <java.version>1.8</java.version>

@@ -11,8 +11,8 @@
     <groupId>project</groupId>
     <artifactId>ground</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>dodgydrivers module</name>
-    <description>quoco rest project for Spring Boot</description>
+    <name>ground</name>
+    <description>ground service</description>
 
     <properties>
         <java.version>1.8</java.version>

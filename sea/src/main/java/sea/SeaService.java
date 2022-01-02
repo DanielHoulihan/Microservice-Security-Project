@@ -3,6 +3,7 @@ package sea;
 import info.ClientInfo;
 import info.Order;
 import info.Quotation;
+import info.TrackingInfo;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,15 +37,15 @@ public class SeaService {
         return new Quotation(COMPANY, generateReference(), (price + urgency_charge), possible);
     }
 
-    int counter = 0;
+    int counter1 = 0;
     protected String generateReference() {
         String ref = SeaService.PREFIX;
         int length = 100000;
         while (length > 1000) {
-            if (counter / length == 0) ref += "0";
+            if (counter1 / length == 0) ref += "0";
             length = length / 10;
         }
-        return ref + counter++;
+        return ref + counter1++;
     }
 
 
@@ -80,21 +81,19 @@ public class SeaService {
         return ref;
     }
 
-    int count2 = 0;
+    int count2 = 1000;
     protected String generateTrackingNumber() {
-        String ref = "TR";
-
-        StringBuilder s = new StringBuilder("AAAAAA");
-        for (int pos = 6; pos >= 0 && count2 > 0 ; pos--) {
-            char digit = (char) ('a' + count2 % 26);
-            s.setCharAt(pos, digit);
-            count2 = count2 / 26;
+        String ref = SeaService.PREFIX;
+        ref+="TRACK";
+        int length = 11111111;
+        while (length > 1000) {
+            if (count2 / length == 0) ref += "0";
+            length = length / 10;
         }
-
-        ref += s;
-        count2+=1;
-        return ref;
+        return ref + count2++;
     }
+
+
 
     protected Order generateOrder(ClientInfo info, Quotation quote) {
         return new Order(generateOrderReference(), generateTrackingNumber(), quote.getPrice());
@@ -113,6 +112,21 @@ public class SeaService {
             e.printStackTrace();
         }
         return new ResponseEntity<>(order, headers, HttpStatus.CREATED);
+    }
+
+
+    @RequestMapping(value="/tracking",method= RequestMethod.POST)
+    public ResponseEntity<TrackingInfo> getTrackingInfo(@RequestBody String trackingNumber){
+        TrackingInfo info = new TrackingInfo("sea", 5, 5);
+        String path = ServletUriComponentsBuilder.fromCurrentContextPath().
+                build().toUriString()+ "/tracking/"+info.getTrackingNumber();
+        HttpHeaders headers = new HttpHeaders();
+        try {
+            headers.setLocation(new URI(path));
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(info, headers, HttpStatus.CREATED);
     }
 
 

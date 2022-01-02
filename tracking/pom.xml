@@ -11,8 +11,8 @@
     <groupId>project</groupId>
     <artifactId>tracking</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>hello-spring</name>
-    <description>Demo project for Spring Boot</description>
+    <name>tracking</name>
+    <description>tracking service</description>
 
     <properties>
         <java.version>1.8</java.version>

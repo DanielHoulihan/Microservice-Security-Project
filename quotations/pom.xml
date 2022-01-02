@@ -11,8 +11,8 @@
     <groupId>project</groupId>
     <artifactId>quotations</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>hello-spring</name>
-    <description>Demo project for Spring Boot</description>
+    <name>quotations</name>
+    <description>quotations service</description>
 
     <properties>
         <java.version>1.8</java.version>
