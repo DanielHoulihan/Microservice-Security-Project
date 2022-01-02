@@ -124,13 +124,16 @@ public class Client {
 
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> request = new HttpEntity<>(trackingNumber);
-        TrackingInfo trackingInfo = restTemplate.postForObject("http://localhost:8085/applications", request, TrackingInfo.class);
-        displayTracking(trackingInfo);
+        TrackingApplication trackingApplication = restTemplate.postForObject("http://localhost:8085/applications", request, TrackingApplication.class);
 
-        System.out.println(trackingInfo.getTrackingNumber());
-        System.out.println(trackingInfo.getDistance());
-        System.out.println(trackingInfo.getTimeRemaining());
-        System.out.println(trackingInfo);
+        for (TrackingInfo tracking : trackingApplication.getTracking()) {
+            displayTracking(tracking);
+        }
+
+//        System.out.println(trackingInfo.getTrackingNumber());
+//        System.out.println(trackingInfo.getDistance());
+//        System.out.println(trackingInfo.getTimeRemaining());
+//        System.out.println(trackingInfo);
     }
 
 
@@ -150,12 +153,12 @@ public class Client {
         }
     }
 
-    public static void displayTracking(TrackingInfo info) {
+    public static void displayTracking(TrackingInfo tracking) {
         System.out.println("\n\n|=================================================================================================================|");
-        System.out.println("|                                  Distributed Security Management Client Profile                                 |");
+        System.out.println("|                                  Distributed Security Management Tracking Information                                 |");
         System.out.println("|=================================================================================================================|");
         System.out.println("|                                     |                                     |                                     |");
-        System.out.println("| distance: " + info.getDistance() + " | number: " + info.getTrackingNumber() + " | time remaining: "+ info.getTimeRemaining());
+        System.out.println("| distance: " + tracking.getDistance() + " | number: " + tracking.getTrackingNumber() + " | time remaining: "+ tracking.getTimeRemaining());
         System.out.println("|                                     |                                     |                                     |");
         System.out.println("|=================================================================================================================|");
     }
