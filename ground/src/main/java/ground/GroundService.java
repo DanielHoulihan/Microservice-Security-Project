@@ -12,10 +12,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 public class GroundService {
@@ -117,10 +114,21 @@ public class GroundService {
         return new Order(generateOrderReference(), trackingNumber, quote.getPrice());
     }
 
-    int time = 100;
-    int distance = 200;
+
     protected void startTracking(String trackingNumber) {
-        trackings.add(new TrackingInfo(trackingNumber, distance, time));
+        int time = 100;
+        int distance = 200;
+        TrackingInfo info = new TrackingInfo(trackingNumber, distance, time);
+        trackings.add(info);
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+
+            @Override
+            public void run() {
+                info.setDistance(info.getDistance()-2);
+                info.setTimeRemaining(info.getTimeRemaining()-1);
+            }
+        }, 0, 5000);
     }
 
 
@@ -133,10 +141,8 @@ public class GroundService {
                 infoToReturn=info;
             }
         }
-
-        TrackingInfo info = new TrackingInfo(trackingNumber, distance, time);
         String path = ServletUriComponentsBuilder.fromCurrentContextPath().
-                build().toUriString()+ "/tracking/"+info.getTrackingNumber();
+                build().toUriString()+ "/tracking/"+infoToReturn.getTrackingNumber();
         HttpHeaders headers = new HttpHeaders();
         try {
             headers.setLocation(new URI(path));

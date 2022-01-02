@@ -13,9 +13,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @RestController
 public class AirService {
@@ -102,12 +99,6 @@ public class AirService {
         return new Order(generateOrderReference(), trackingNumber, quote.getPrice());
     }
 
-    int time = 100;
-    int distance = 200;
-    protected void startTracking(String trackingNumber) {
-        trackings.add(new TrackingInfo(trackingNumber, distance, time));
-    }
-
 
     private Map<String, Order> orders = new HashMap<>();
     @RequestMapping(value="/ordering",method= RequestMethod.POST)
@@ -125,6 +116,24 @@ public class AirService {
         return new ResponseEntity<>(order, headers, HttpStatus.CREATED);
     }
 
+
+    protected void startTracking(String trackingNumber) {
+        int time = 100;
+        int distance = 200;
+        TrackingInfo info = new TrackingInfo(trackingNumber, distance, time);
+        trackings.add(info);
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+
+            @Override
+            public void run() {
+                info.setDistance(info.getDistance()-2);
+                info.setTimeRemaining(info.getTimeRemaining()-1);
+            }
+        }, 0, 5000);
+    }
+
+
     @RequestMapping(value="/tracking",method= RequestMethod.POST)
     public ResponseEntity<TrackingInfo> getTrackingInfo(@RequestBody String trackingNumber){
 
@@ -134,10 +143,8 @@ public class AirService {
                 infoToReturn=info;
             }
         }
-
-        TrackingInfo info = new TrackingInfo(trackingNumber, distance, time);
         String path = ServletUriComponentsBuilder.fromCurrentContextPath().
-                build().toUriString()+ "/tracking/"+info.getTrackingNumber();
+                build().toUriString()+ "/tracking/"+infoToReturn.getTrackingNumber();
         HttpHeaders headers = new HttpHeaders();
         try {
             headers.setLocation(new URI(path));

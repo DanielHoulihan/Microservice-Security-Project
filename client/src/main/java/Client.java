@@ -28,11 +28,13 @@ public class Client {
 
             if(input.equals("CREATE")){
                 createUser();
+                displayProfiles(clients);
             }
 
             if(clients.isEmpty()) {
                 System.out.println("No users exist, you must create one");
                 createUser();
+                displayProfiles(clients);
             }
 
             if(input.equals("TRACK")){
@@ -50,14 +52,18 @@ public class Client {
                 order();
             }
 
-            for (ClientInfo clientInfo : clients) {
-                System.out.println("|=================================================================================================================|");
-                System.out.println("|                                  Distributed Security Management Client Profiles                                |");
-                displayProfile(clientInfo);
-            }
+
 
         }
 
+    }
+
+    public static void displayProfiles(ArrayList<ClientInfo> info){
+        for (ClientInfo clientInfo : clients) {
+            System.out.println("|=================================================================================================================|");
+            System.out.println("|                                  Distributed Security Management Client Profiles                                |");
+            displayProfile(clientInfo);
+        }
     }
 
 
@@ -79,7 +85,7 @@ public class Client {
             System.out.println("Name: " + name);
             System.out.println("Urgency: " + urgency);
             System.out.println("Location: " + location);
-            if ((urgency.equals("ASAP") || urgency.equals("SOON")) && (location.equals("AIR") || location.equals("SEA") || location.equals("LAND"))) {
+            if ((urgency.equals("ASAP") || urgency.equals("SOON") || urgency.equals("WHENEVER")) && (location.equals("AIR") || location.equals("SEA") || location.equals("LAND"))) {
                 System.out.println("\nAre you satisfied with the details entered? (Y) or (N).");
                 output = sc.nextLine().toUpperCase();
             } else {
@@ -123,7 +129,6 @@ public class Client {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> request = new HttpEntity<>(trackingNumber);
         TrackingApplication trackingApplication = restTemplate.postForObject("http://localhost:8085/applications", request, TrackingApplication.class);
-<<<<<<< HEAD
         assert trackingApplication != null;
 
         for (TrackingInfo tracking : trackingApplication.getTracking()) {
@@ -133,17 +138,7 @@ public class Client {
         }
 
 
-=======
 
-        for (TrackingInfo tracking : trackingApplication.getTracking()) {
-            displayTracking(tracking);
-        }
-
-//        System.out.println(trackingInfo.getTrackingNumber());
-//        System.out.println(trackingInfo.getDistance());
-//        System.out.println(trackingInfo.getTimeRemaining());
-//        System.out.println(trackingInfo);
->>>>>>> 41739a228b7b4f3a3535862bd359b117b66734eb
     }
 
 
@@ -166,11 +161,7 @@ public class Client {
 
     public static void displayTracking(TrackingInfo tracking) {
         System.out.println("\n\n|=================================================================================================================|");
-<<<<<<< HEAD
         System.out.println("|                                                 TRACKING                                                        |");
-=======
-        System.out.println("|                                  Distributed Security Management Tracking Information                                 |");
->>>>>>> 41739a228b7b4f3a3535862bd359b117b66734eb
         System.out.println("|=================================================================================================================|");
         System.out.println("|                                     |                                     |                                     |");
         System.out.println("| distance: " + tracking.getDistance() + " | number: " + tracking.getTrackingNumber() + " | time remaining: "+ tracking.getTimeRemaining());
