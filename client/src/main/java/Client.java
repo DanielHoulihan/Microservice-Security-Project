@@ -35,6 +35,10 @@ public class Client {
             Scanner sc = new Scanner(System.in);
             String input = sc.nextLine().toUpperCase();
 
+            if(input.equals("CREATE")){
+                createUser();
+            }
+
             if(clients.isEmpty()) {
                 System.out.println("No users exist, you must create one");
                 createUser();
@@ -42,10 +46,6 @@ public class Client {
 
             if(input.equals("TRACK")){
                 getTracking();
-            }
-
-            if(input.equals("CREATE")){
-                createUser();
             }
 
             if(input.equals("ORDER") && !clients.isEmpty()){
@@ -64,13 +64,6 @@ public class Client {
     }
 
 
-
-    public static void check_quit(String input) {
-        if(input.equals("quit")) {
-            System.exit(0);
-        }
-    }
-
     public static void createUser() {
         String output = "";
         String name = "";
@@ -80,13 +73,10 @@ public class Client {
             Scanner sc = new Scanner(System.in);
             System.out.println("Enter your name: ");
             name = sc.nextLine().toUpperCase();
-            check_quit(name);
             System.out.println("Enter the urgency which the job requires (ASAP/SOON/WHENEVER): ");
             urgency = sc.nextLine().toUpperCase();
-            check_quit(urgency);
             System.out.println("Enter the location which the job requires (AIR/SEA/LAND): ");
             location = sc.nextLine().toUpperCase();
-            check_quit(location);
 
             System.out.println("\nThe details you entered are:\n");
             System.out.println("Name: " + name);
@@ -95,13 +85,11 @@ public class Client {
             if ((urgency.equals("ASAP") || urgency.equals("SOON")) && (location.equals("AIR") || location.equals("SEA") || location.equals("LAND"))) {
                 System.out.println("\nAre you satisfied with the details entered? (Y) or (N).");
                 output = sc.nextLine().toUpperCase();
-                check_quit(output);
             } else {
                 output = "N";
                 System.out.println("\n*** One or more of the inputs given were wrong, try again please. ***\n");
             }
         } while (output.equalsIgnoreCase("N"));
-
         clients.add(new ClientInfo(name, urgency, location));
 
     }
@@ -144,8 +132,6 @@ public class Client {
         System.out.println(trackingInfo.getTimeRemaining());
         System.out.println(trackingInfo);
     }
-
-
 
 
     public static void order(ClientInfo info) {

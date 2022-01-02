@@ -10,11 +10,6 @@ public class ClientInfo {
 
     public ClientInfo() {}
 
-    /**
-     * Public fields are used as modern best practice argues that use of set/get
-     * methods is unnecessary as (1) set/get makes the field mutable anyway, and
-     * (2) set/get introduces additional method calls, which reduces performance.
-     */
     private String name;
     private String urgency;
     private String location;
