@@ -18,54 +18,56 @@ public class Client {
 
         displayLogo();
 
-
+        System.out.println("Welcome to Distributed Security Management!\n\n");
+        String check = "";
 
         while (true) {
+            do {
+                System.out.println("Please choose one of the following options in order to proceed: \n");
+                System.out.println("1) To create a new user profile please enter: CREATE");
+                System.out.println("2) To create a new order please enter:        ORDER");
+                System.out.println("3) To track an existing order please enter:   TRACK\n");
+                Scanner sc = new Scanner(System.in);
+                String input = sc.nextLine().toUpperCase();
 
-            System.out.println("Would you like to create a new user (CREATE), track an order (TRACK), or order with an existing user (ORDER)?");
-            Scanner sc = new Scanner(System.in);
-            String input = sc.nextLine().toUpperCase();
-
-            if(input.equals("CREATE")){
-                createUser();
-                displayProfiles(clients);
-            }
-
-            if(clients.isEmpty()) {
-                System.out.println("No users exist, you must create one");
-                createUser();
-                displayProfiles(clients);
-            }
-
-            if(input.equals("TRACK")){
-                getTracking();
-            }
-
-            if(input.equals("ORDER") && !clients.isEmpty()){
-                System.out.println("Which user would you like to order as? Give the name");
-                String user = sc.nextLine().toUpperCase();
-                for(ClientInfo client : clients) {
-                    if(client.getName().equals(user)) {
-                        getQuotes(client);
+                if (input.equals("CREATE")) {
+                    check = "Y";
+                    createUser();
+                    displayProfiles(clients);
+                } else if (clients.isEmpty()) {
+                    System.out.println("No users exist, you must create one");
+                    check = "Y";
+                    createUser();
+                    displayProfiles(clients);
+                } else if (input.equals("TRACK")) {
+                    check = "Y";
+                    getTracking();
+                } else if (input.equals("ORDER") && !clients.isEmpty()) {
+                    check = "Y";
+                    System.out.println("\nWhich user would you like to order as? The available user accounts are: ");
+                    for (ClientInfo client : clients) {
+                        System.out.println("-> " + client.getName());
                     }
+                    String user = sc.nextLine().toUpperCase();
+                    for (ClientInfo client : clients) {
+                        if (client.getName().equals(user)) {
+                            getQuotes(client);
+                        }
+                    }
+                    order();
+                } else {
+                    check = "N";
+                    System.out.println("\n*** Wrong input given, please try again. ***\n");
                 }
-                order();
-            }
-
-
-
+            } while (check.equalsIgnoreCase("N"));
         }
-
     }
 
     public static void displayProfiles(ArrayList<ClientInfo> info){
         for (ClientInfo clientInfo : clients) {
-            System.out.println("|=================================================================================================================|");
-            System.out.println("|                                  Distributed Security Management Client Profiles                                |");
             displayProfile(clientInfo);
         }
     }
-
 
     public static void createUser() {
         String output = "";
@@ -74,7 +76,7 @@ public class Client {
         String location = "";
         do {
             Scanner sc = new Scanner(System.in);
-            System.out.println("Enter your name: ");
+            System.out.println("\nEnter your name: ");
             name = sc.nextLine().toUpperCase();
             System.out.println("Enter the urgency which the job requires (ASAP/SOON/WHENEVER): ");
             urgency = sc.nextLine().toUpperCase();
@@ -94,7 +96,7 @@ public class Client {
             }
         } while (output.equalsIgnoreCase("N"));
         clients.add(new ClientInfo(name, urgency, location));
-
+        System.out.println("\n** New User Created Successfully! **");
     }
 
 
@@ -120,10 +122,9 @@ public class Client {
         }
     }
 
-
     public static void getTracking() {
         Scanner sc = new Scanner(System.in);
-        System.out.println("\nEnter the tracking number ");
+        System.out.println("\nEnter the assigned tracking number please: ");
         String trackingNumber = sc.nextLine();
 
         RestTemplate restTemplate = new RestTemplate();
@@ -131,16 +132,13 @@ public class Client {
         TrackingApplication trackingApplication = restTemplate.postForObject("http://localhost:8085/applications", request, TrackingApplication.class);
         assert trackingApplication != null;
 
+        System.out.println("\n** Tracking Reference Found Successfully! **");
         for (TrackingInfo tracking : trackingApplication.getTracking()) {
             if(tracking.getTrackingNumber()!=null) {
                 displayTracking(tracking);
             }
         }
-
-
-
     }
-
 
     public static void order() {
 
@@ -154,6 +152,7 @@ public class Client {
         OrderApplication orderApplication = restTemplate.postForObject("http://localhost:8084/applications", request2, OrderApplication.class);
 
         assert orderApplication != null;
+        System.out.println("\n** New Order Created Successfully! **");
         for (Order order : orderApplication.getOrders()) {
             displayOrder(order);
         }
@@ -161,17 +160,18 @@ public class Client {
 
     public static void displayTracking(TrackingInfo tracking) {
         System.out.println("\n\n|=================================================================================================================|");
-        System.out.println("|                                                 TRACKING                                                        |");
+        System.out.println("|                                  Distributed Security Management Tracking Details                               |");
         System.out.println("|=================================================================================================================|");
         System.out.println("|                                     |                                     |                                     |");
-        System.out.println("| distance: " + tracking.getDistance() + " | number: " + tracking.getTrackingNumber() + " | time remaining: "+ tracking.getTimeRemaining());
+        System.out.println("| Distance: " + String.format("%1$-25s", tracking.getDistance()) + " | Tracking Number: " + String.format("%1$-18s", tracking.getTrackingNumber()) + " | Time Remaining: "+ String.format("%1$-19s", tracking.getTimeRemaining())+" |");
         System.out.println("|                                     |                                     |                                     |");
-        System.out.println("|=================================================================================================================|");
+        System.out.println("|=================================================================================================================|\n\n");
     }
 
 
     public static void displayProfile(ClientInfo info) {
-
+        System.out.println("\n\n|=================================================================================================================|");
+        System.out.println("|                                  Distributed Security Management Client Profiles                                |");
         System.out.println("|=================================================================================================================|");
         System.out.println("|                                     |                                     |                                     |");
         System.out.println(
@@ -179,7 +179,7 @@ public class Client {
                         " | Urgency: " + String.format("%1$-26s", (info.getUrgency())) +
                         " | Location: " + String.format("%1$-25s", info.getLocation())+" |");
         System.out.println("|                                     |                                     |                                     |");
-        System.out.println("|=================================================================================================================|");
+        System.out.println("|=================================================================================================================|\n");
     }
 
     public static void displayQuotation(Quotation quotation) {
@@ -191,6 +191,7 @@ public class Client {
                 "| Company: " + String.format("%1$-26s", quotation.getCompany()) +
                         " | Reference: " + String.format("%1$-24s", quotation.getReference()) +
                         " | Price: " + String.format("%1$-28s", NumberFormat.getCurrencyInstance().format(quotation.getPrice()))+" |");
+        System.out.println("|                                     |                                     |                                     |");
         System.out.println("|=================================================================================================================|");
     }
 
@@ -204,11 +205,12 @@ public class Client {
         System.out.println("\n\n|=================================================================================================================|");
         System.out.println("|                                Distributed Security Management Order Reference                                  |");
         System.out.println("|=================================================================================================================|");
-        System.out.println("|                           |                                                    |                                |");
+        System.out.println("|                       |                                                    |                                    |");
         System.out.println(
-                "| Price: " + String.format("%1$-18s", NumberFormat.getCurrencyInstance().format(order.getPrice())) +
+                "| Price: " + String.format("%1$-14s", NumberFormat.getCurrencyInstance().format(order.getPrice())) +
                         " | Reference: " + String.format("%1$-30s", order.getReference()) +
-                        " | Tracking Number: " + String.format("%1$-13s", order.getTrackingNumber())+" |");
+                        " | Tracking Number: " + String.format("%1$-17s", order.getTrackingNumber())+" |");
+        System.out.println("|                       |                                                    |                                    |");
         System.out.println("|=================================================================================================================|\n\n");
     }
 
