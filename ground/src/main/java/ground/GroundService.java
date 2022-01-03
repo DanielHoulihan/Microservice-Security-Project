@@ -116,8 +116,10 @@ public class GroundService {
 
 
     protected void startTracking(String trackingNumber) {
-        int time = 100;
-        int distance = 200;
+        Random r = new Random();
+        int time = r.nextInt(300-250) + 250;
+        int distance = time*2;
+
         TrackingInfo info = new TrackingInfo(trackingNumber, distance, time);
         trackings.add(info);
         Timer timer = new Timer();
@@ -128,7 +130,7 @@ public class GroundService {
                 info.setDistance(info.getDistance()-2);
                 info.setTimeRemaining(info.getTimeRemaining()-1);
             }
-        }, 0, 5000);
+        }, 0, 1000);
     }
 
 

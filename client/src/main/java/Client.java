@@ -108,7 +108,6 @@ public class Client {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<ClientInfo> request = new HttpEntity<>(client);
         ClientApplication clientApplication = restTemplate.postForObject("http://localhost:8083/applications", request, ClientApplication.class);
-//        ClientApplication clientApplication = restTemplate.postForObject("http://0.0.0.0:8083/applications", request, ClientApplication.class);
         displayProfile(client);
 
         assert clientApplication != null;
@@ -134,13 +133,17 @@ public class Client {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> request = new HttpEntity<>(trackingNumber);
         TrackingApplication trackingApplication = restTemplate.postForObject("http://localhost:8085/applications", request, TrackingApplication.class);
-//        TrackingApplication trackingApplication = restTemplate.postForObject("http://docker.for.mac.host.internal:8085/applications", request, TrackingApplication.class);
         assert trackingApplication != null;
 
-        System.out.println("\n** Tracking Reference Found Successfully! **");
         for (TrackingInfo tracking : trackingApplication.getTracking()) {
             if(tracking.getTrackingNumber()!=null) {
-                displayTracking(tracking);
+                if(tracking.getDistance() != 0 && tracking.getTimeRemaining() != 0) {
+                    System.out.println("\n** Tracking Reference Found Successfully! **");
+                    displayTracking(tracking);
+                }
+                else{
+                    System.out.println("---------------------- Your order ("+tracking.getTrackingNumber()+") has arrived! --------------------------------");
+                }
             }
         }
     }
@@ -155,7 +158,6 @@ public class Client {
         Quotation quote1 = cache.get(chosenOrder);
         HttpEntity<Quotation> request2 = new HttpEntity<>(quote1);
         OrderApplication orderApplication = restTemplate.postForObject("http://localhost:8084/applications", request2, OrderApplication.class);
-//        OrderApplication orderApplication = restTemplate.postForObject("http://docker.for.mac.host.internal:8084/applications", request2, OrderApplication.class);
 
         assert orderApplication != null;
         System.out.println("\n** New Order Created Successfully! **");
@@ -169,7 +171,7 @@ public class Client {
         System.out.println("|                                  Distributed Security Management Tracking Details                               |");
         System.out.println("|=================================================================================================================|");
         System.out.println("|                                     |                                     |                                     |");
-        System.out.println("| Distance: " + String.format("%1$-25s", tracking.getDistance()) + " | Tracking Number: " + String.format("%1$-18s", tracking.getTrackingNumber()) + " | Time Remaining: "+ String.format("%1$-19s", tracking.getTimeRemaining())+" |");
+        System.out.println("| Distance: " + tracking.getDistance() + " Kilometers           | Tracking Number: " + tracking.getTrackingNumber() + "    | Time Remaining: "+  tracking.getTimeRemaining()+" seconds          |");
         System.out.println("|                                     |                                     |                                     |");
         System.out.println("|=================================================================================================================|\n\n");
     }

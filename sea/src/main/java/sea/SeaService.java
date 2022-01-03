@@ -117,8 +117,10 @@ public class SeaService {
     }
 
     protected void startTracking(String trackingNumber) {
-        int time = 100;
-        int distance = 200;
+        Random r = new Random();
+        int time = r.nextInt(200-150) + 150;
+        int distance = time*5;
+
         TrackingInfo info = new TrackingInfo(trackingNumber, distance, time);
         trackings.add(info);
         Timer timer = new Timer();
@@ -126,10 +128,11 @@ public class SeaService {
 
             @Override
             public void run() {
-                info.setDistance(info.getDistance()-2);
+                int distanceReduction = r.nextInt(1000-500) + 500;
+                info.setDistance(info.getDistance()-5);
                 info.setTimeRemaining(info.getTimeRemaining()-1);
             }
-        }, 0, 5000);
+        }, 0, 1000);
     }
 
 

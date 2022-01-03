@@ -118,8 +118,10 @@ public class AirService {
 
 
     protected void startTracking(String trackingNumber) {
-        int time = 100;
-        int distance = 200;
+        Random r = new Random();
+        int time = r.nextInt(100-50) + 50;
+        int distance = time*15;
+
         TrackingInfo info = new TrackingInfo(trackingNumber, distance, time);
         trackings.add(info);
         Timer timer = new Timer();
@@ -127,10 +129,10 @@ public class AirService {
 
             @Override
             public void run() {
-                info.setDistance(info.getDistance()-2);
+                info.setDistance(info.getDistance()-15);
                 info.setTimeRemaining(info.getTimeRemaining()-1);
             }
-        }, 0, 5000);
+        }, 0, 1000);
     }
 
 
