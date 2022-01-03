@@ -1,4 +1,6 @@
-To run quotations manually:
+To run project manually:
+
+mvn clean install
 
 mvn spring-boot:run -pl sea
 
@@ -10,8 +12,18 @@ mvn spring-boot:run -pl quotations
 
 mvn spring-boot:run -pl ordering
 
+mvn spring-boot:run -pl tracking
+
 mvn exec:java -pl client
 
+---
 
+To run the project using docker:
 
-This will run all the microservices, get quotations from each of them and make an order with one of them
+mvn clean install
+
+docker compose build 
+
+docker compose up
+
+mvn exec:java -pl client

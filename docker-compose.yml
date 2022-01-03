@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+
+  ordering:
+    build: ordering
+    depends_on:
+      - air
+      - sea
+      - ground
+    ports:
+      - "8084:8084"
+
+
+  quotations:
+    build: quotations
+    depends_on:
+      - air
+      - sea
+      - ground
+    ports:
+      - "8083:8083"
+
+  tracking:
+    build: tracking
+    depends_on:
+      - air
+      - sea
+      - ground
+    ports:
+      - "8085:8085"
+
+  air:
+    build: air
+#    ports:
+#      - "8080:8080"
+
+  sea:
+    build: sea
+#    ports:
+#      - "8081:8081"
+
+  ground:
+    build: ground
+#    ports:
+#      - "8082:8082"

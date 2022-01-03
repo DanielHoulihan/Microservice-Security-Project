@@ -20,9 +20,9 @@ public class TrackingService {
         HttpEntity<String> request = new HttpEntity<>(trackingNumber);
         ArrayList<TrackingInfo> trackingInfos = new ArrayList<>();
 
-        trackingInfos.add(restTemplate.postForObject("http://localhost:8080/tracking", request, TrackingInfo.class));
-        trackingInfos.add(restTemplate.postForObject("http://localhost:8081/tracking", request, TrackingInfo.class));
-        trackingInfos.add(restTemplate.postForObject("http://localhost:8082/tracking", request, TrackingInfo.class));
+        trackingInfos.add(restTemplate.postForObject("http://air:8080/tracking", request, TrackingInfo.class));
+        trackingInfos.add(restTemplate.postForObject("http://sea:8081/tracking", request, TrackingInfo.class));
+        trackingInfos.add(restTemplate.postForObject("http://ground:8082/tracking", request, TrackingInfo.class));
 
 
         TrackingApplication trackingApplication = new TrackingApplication(trackingInfos);

@@ -18,12 +18,12 @@ public class Client {
 
         displayLogo();
 
-        System.out.println("Welcome to Distributed Security Management!\n\n");
+        System.out.println("Welcome to Distributed Security Management!\n");
         String check = "";
 
         while (true) {
             do {
-                System.out.println("Please choose one of the following options in order to proceed: \n");
+                System.out.println("\nPlease choose one of the following options in order to proceed: \n");
                 System.out.println("1) To create a new user profile please enter: CREATE");
                 System.out.println("2) To create a new order please enter:        ORDER");
                 System.out.println("3) To track an existing order please enter:   TRACK\n");
@@ -64,6 +64,9 @@ public class Client {
     }
 
     public static void displayProfiles(ArrayList<ClientInfo> info){
+        System.out.println("\n|=================================================================================================================|");
+        System.out.println("|                                  Distributed Security Management Client Profiles                                |");
+        System.out.println("|=================================================================================================================|");
         for (ClientInfo clientInfo : clients) {
             displayProfile(clientInfo);
         }
@@ -105,6 +108,7 @@ public class Client {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<ClientInfo> request = new HttpEntity<>(client);
         ClientApplication clientApplication = restTemplate.postForObject("http://localhost:8083/applications", request, ClientApplication.class);
+//        ClientApplication clientApplication = restTemplate.postForObject("http://0.0.0.0:8083/applications", request, ClientApplication.class);
         displayProfile(client);
 
         assert clientApplication != null;
@@ -130,6 +134,7 @@ public class Client {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> request = new HttpEntity<>(trackingNumber);
         TrackingApplication trackingApplication = restTemplate.postForObject("http://localhost:8085/applications", request, TrackingApplication.class);
+//        TrackingApplication trackingApplication = restTemplate.postForObject("http://docker.for.mac.host.internal:8085/applications", request, TrackingApplication.class);
         assert trackingApplication != null;
 
         System.out.println("\n** Tracking Reference Found Successfully! **");
@@ -150,6 +155,7 @@ public class Client {
         Quotation quote1 = cache.get(chosenOrder);
         HttpEntity<Quotation> request2 = new HttpEntity<>(quote1);
         OrderApplication orderApplication = restTemplate.postForObject("http://localhost:8084/applications", request2, OrderApplication.class);
+//        OrderApplication orderApplication = restTemplate.postForObject("http://docker.for.mac.host.internal:8084/applications", request2, OrderApplication.class);
 
         assert orderApplication != null;
         System.out.println("\n** New Order Created Successfully! **");
@@ -170,16 +176,13 @@ public class Client {
 
 
     public static void displayProfile(ClientInfo info) {
-        System.out.println("\n\n|=================================================================================================================|");
-        System.out.println("|                                  Distributed Security Management Client Profiles                                |");
-        System.out.println("|=================================================================================================================|");
         System.out.println("|                                     |                                     |                                     |");
         System.out.println(
                 "| Name: " + String.format("%1$-29s", info.getName()) +
                         " | Urgency: " + String.format("%1$-26s", (info.getUrgency())) +
                         " | Location: " + String.format("%1$-25s", info.getLocation())+" |");
         System.out.println("|                                     |                                     |                                     |");
-        System.out.println("|=================================================================================================================|\n");
+        System.out.println("|=================================================================================================================|");
     }
 
     public static void displayQuotation(Quotation quotation) {

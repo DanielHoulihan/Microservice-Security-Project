@@ -17,6 +17,8 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="eureka" target="1.8" />
+      <module name="eureka-discovery" target="1.8" />
       <module name="router" target="8" />
     </bytecodeTargetLevel>
   </component>

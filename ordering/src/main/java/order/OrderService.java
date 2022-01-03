@@ -21,13 +21,13 @@ public class OrderService {
         ArrayList<Order> orders = new ArrayList<>();
 
         if(quote.getCompany().equals("Royal Air Force")){
-            orders.add(restTemplate.postForObject("http://localhost:8080/ordering", request, Order.class));
+            orders.add(restTemplate.postForObject("http://air:8080/ordering", request, Order.class));
         }
         if(quote.getCompany().equals("Navy Seals")){
-            orders.add(restTemplate.postForObject("http://localhost:8081/ordering", request, Order.class));
+            orders.add(restTemplate.postForObject("http://sea:8081/ordering", request, Order.class));
         }
         if(quote.getCompany().equals("Army")){
-            orders.add(restTemplate.postForObject("http://localhost:8082/ordering", request, Order.class));
+            orders.add(restTemplate.postForObject("http://ground:8082/ordering", request, Order.class));
         }
 
         OrderApplication orderApplication = new OrderApplication(clientNumber, info, orders);
