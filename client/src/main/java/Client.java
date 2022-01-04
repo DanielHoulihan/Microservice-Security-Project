@@ -29,14 +29,15 @@ public class Client {
                 System.out.println("\nPlease choose one of the following options in order to proceed: \n");
                 System.out.println("1) To create a new user profile enter: CREATE");
                 System.out.println("2) To create a new order enter:        ORDER");
-                System.out.println("3) To track an existing order enter:   TRACK\n");
+                System.out.println("3) To track an existing order enter:   TRACK");
+                System.out.println("4) To quit the application enter:      QUIT\n");
                 Scanner sc = new Scanner(System.in);
                 String input = sc.nextLine().toUpperCase();
 
                 if (input.equals("CREATE")) {
                     createUser();
                     displayProfiles(clients);
-                } else if (clients.isEmpty()) {
+                } else if (clients.isEmpty() && !input.equals("QUIT")) {
                     System.out.println(ANSI_RED+"\n------------------ No users exist, you must create one first ---------------------"+ANSI_RESET);
                     createUser();
                     displayProfiles(clients);
@@ -65,6 +66,8 @@ public class Client {
                     }
                     getQuotes(clientToUse);
                     order();
+                } else if(input.equals("QUIT")) {
+                    killApp();
                 } else {
                     check = "N";
                     System.out.println(ANSI_RED+"\n*** Wrong input given, please try again. ***\n"+ANSI_RESET);
@@ -219,6 +222,13 @@ public class Client {
         for (Order order : orderApplication.getOrders()) {
             displayOrder(order);
         }
+    }
+
+    public static void killApp() {
+        System.out.println(ANSI_BLUE+"\n\nThank you for using Distributed Security Management!"+ANSI_RESET);
+        System.out.println(ANSI_BLUE+"We look forward to seeing you again soon!"+ANSI_RESET);
+        displayLogo();
+        System.exit(0);
     }
 
     public static void displayTracking(TrackingInfo tracking) {
