@@ -54,7 +54,7 @@ public class Client {
                             if (client.getName().equals(user)) {
                                 clientExists = true;
                                 getQuotes(client);
-                                break;
+                                //break;
                             }
                             else {
                                 System.out.println(ANSI_RED + "------------- Please enter a valid name -------------" + ANSI_RESET);
@@ -139,7 +139,8 @@ public class Client {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<UserInfo> request = new HttpEntity<>(client);
         QuotationApplication clientApplication = restTemplate.postForObject("http://localhost:8083/applications", request, QuotationApplication.class);
-        displayProfile(client);
+
+        displaySingleProfile(client);
 
         assert clientApplication != null;
         for (Quotation quotation : clientApplication.getQuotations()) {
@@ -239,6 +240,13 @@ public class Client {
                         " | Location: " + String.format("%1$-25s", info.getLocation())+" |");
         System.out.println("|                                     |                                     |                                     |");
         System.out.println("|=================================================================================================================|");
+    }
+
+    public static void displaySingleProfile(UserInfo info) {
+        System.out.println("\n|=================================================================================================================|");
+        System.out.println("|                                  Distributed Security Management Client Profiles                                |");
+        System.out.println("|=================================================================================================================|");
+        displayProfile(info);
     }
 
     public static void displayQuotation(Quotation quotation) {
