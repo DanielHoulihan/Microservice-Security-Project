@@ -285,12 +285,12 @@ public class Client {
     }
 
     public static void displayLogo() {
-        System.out.println(ANSI_YELLOW + "\n\n ______      ______    ____    ____  " + ANSI_RESET);
-        System.out.println(ANSI_YELLOW + "|_   _ `.  .' ____ \\  |_   \\  /   _| " + ANSI_RESET);
-        System.out.println(ANSI_YELLOW + "  | | `. \\ | (___ \\_|   |   \\/   |   " + ANSI_RESET);
-        System.out.println(ANSI_YELLOW + "  | |  | |  _.____`.    | |\\  /| |   " + ANSI_RESET);
-        System.out.println(ANSI_YELLOW + " _| |_.' / | \\____) |  _| |_\\/_| |_  " + ANSI_RESET);
-        System.out.println(ANSI_YELLOW + "|______.'   \\______.' |_____||_____| \n\n" + ANSI_RESET);
+        System.out.println(ANSI_RED + "\n\n ______      ______    ____    ____  " + ANSI_RESET);
+        System.out.println(ANSI_RED + "|_   _ `.  .' ____ \\  |_   \\  /   _| " + ANSI_RESET);
+        System.out.println(ANSI_BLUE + "  | | `. \\ | (___ \\_|   |   \\/   |   " + ANSI_RESET);
+        System.out.println(ANSI_BLUE + "  | |  | |  _.____`.    | |\\  /| |   " + ANSI_RESET);
+        System.out.println(ANSI_GREEN + " _| |_.' / | \\____) |  _| |_\\/_| |_  " + ANSI_RESET);
+        System.out.println(ANSI_GREEN + "|______.'   \\______.' |_____||_____| \n\n" + ANSI_RESET);
     }
 }
 
