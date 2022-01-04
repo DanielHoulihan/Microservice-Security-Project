@@ -2,10 +2,11 @@
 
 ##### Daniel Houlihan (18339866)
 ##### Shane Cooke (17400206)
+##### Jack Crowley (17484414)
 
 ***
 
-##To run project manually:
+## To run project manually:
 
 1) `mvn clean install`
 
@@ -27,7 +28,7 @@
 
 ---
 
-##To run the project using docker:
+## To run the project using docker:
 
 1) `mvn clean install`
 
@@ -38,3 +39,6 @@
 4) `mvn exec:java -pl client`
 
 ***
+
+## Project Video:
+https://drive.google.com/file/d/1iwVg67pT3BOBRQuND8ev_bgjW1rYR_Ya/view?usp=sharing
