@@ -15,7 +15,7 @@ public class OrderService {
     public static int clientNumber = 0;
 
     @RequestMapping(value="/applications",method = RequestMethod.POST)
-    public OrderApplication makeOrder(@RequestBody Quotation quote, ClientInfo info){
+    public OrderApplication makeOrder(@RequestBody Quotation quote, UserInfo info){
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<Quotation> request = new HttpEntity<>(quote);
         ArrayList<Order> orders = new ArrayList<>();
@@ -29,7 +29,9 @@ public class OrderService {
         if(quote.getCompany().equals("Army")){
             orders.add(restTemplate.postForObject("http://ground:8082/ordering", request, Order.class));
         }
-
+        if(quote.getCompany().equals("Space Force")){
+            orders.add(restTemplate.postForObject("http://space:8089/ordering", request, Order.class));
+        }
         OrderApplication orderApplication = new OrderApplication(clientNumber, info, orders);
         map.put(clientNumber, orderApplication);
         return orderApplication;

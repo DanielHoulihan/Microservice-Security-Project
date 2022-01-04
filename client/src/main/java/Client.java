@@ -9,9 +9,12 @@ import java.util.TreeMap;
 
 public class Client {
 
+    private static final String ANSI_GREEN = "\u001B[32m";
+    private static final String ANSI_RED = "\u001B[31m";
+    private static final String ANSI_BLUE = "\u001B[34m";
     private static final String ANSI_YELLOW = "\u001B[33m";
     private static final String ANSI_RESET = "\u001B[0m";
-    private static final ArrayList<ClientInfo> clients = new ArrayList<>();
+    private static final ArrayList<UserInfo> clients = new ArrayList<>();
     private static final TreeMap<Integer, Quotation> cache = new TreeMap<Integer, Quotation>();
 
     public static void main(String[] args) {
@@ -19,56 +22,60 @@ public class Client {
         displayLogo();
 
         System.out.println("Welcome to Distributed Security Management!\n");
-        String check = "";
+        String check = "Y";
 
         while (true) {
             do {
                 System.out.println("\nPlease choose one of the following options in order to proceed: \n");
-                System.out.println("1) To create a new user profile please enter: CREATE");
-                System.out.println("2) To create a new order please enter:        ORDER");
-                System.out.println("3) To track an existing order please enter:   TRACK\n");
+                System.out.println("1) To create a new user profile enter: CREATE");
+                System.out.println("2) To create a new order enter:        ORDER");
+                System.out.println("3) To track an existing order enter:   TRACK\n");
                 Scanner sc = new Scanner(System.in);
                 String input = sc.nextLine().toUpperCase();
 
                 if (input.equals("CREATE")) {
-                    check = "Y";
                     createUser();
                     displayProfiles(clients);
                 } else if (clients.isEmpty()) {
-                    System.out.println("No users exist, you must create one");
-                    check = "Y";
+                    System.out.println(ANSI_RED+"\n------------------ No users exist, you must create one first ---------------------"+ANSI_RESET);
                     createUser();
                     displayProfiles(clients);
                 } else if (input.equals("TRACK")) {
-                    check = "Y";
                     getTracking();
-                } else if (input.equals("ORDER") && !clients.isEmpty()) {
-                    check = "Y";
+                } else if (input.equals("ORDER")) {
                     System.out.println("\nWhich user would you like to order as? The available user accounts are: ");
-                    for (ClientInfo client : clients) {
+                    for (UserInfo client : clients) {
                         System.out.println("-> " + client.getName());
                     }
-                    String user = sc.nextLine().toUpperCase();
-                    for (ClientInfo client : clients) {
-                        if (client.getName().equals(user)) {
-                            getQuotes(client);
+                    boolean clientExists=false;
+                    while(!clientExists) {
+                        String user = sc.nextLine().toUpperCase();
+                        for (UserInfo client : clients) {
+                            if (client.getName().equals(user)) {
+                                clientExists = true;
+                                getQuotes(client);
+                                break;
+                            }
+                            else {
+                                System.out.println(ANSI_RED + "------------- Please enter a valid name -------------" + ANSI_RESET);
+                            }
                         }
                     }
                     order();
                 } else {
                     check = "N";
-                    System.out.println("\n*** Wrong input given, please try again. ***\n");
+                    System.out.println(ANSI_RED+"\n*** Wrong input given, please try again. ***\n"+ANSI_RESET);
                 }
             } while (check.equalsIgnoreCase("N"));
         }
     }
 
-    public static void displayProfiles(ArrayList<ClientInfo> info){
+    public static void displayProfiles(ArrayList<UserInfo> info){
         System.out.println("\n|=================================================================================================================|");
         System.out.println("|                                  Distributed Security Management Client Profiles                                |");
         System.out.println("|=================================================================================================================|");
-        for (ClientInfo clientInfo : clients) {
-            displayProfile(clientInfo);
+        for (UserInfo userInfo : info) {
+            displayProfile(userInfo);
         }
     }
 
@@ -80,34 +87,58 @@ public class Client {
         do {
             Scanner sc = new Scanner(System.in);
             System.out.println("\nEnter your name: ");
-            name = sc.nextLine().toUpperCase();
+            if(clients.isEmpty()){
+                name = sc.nextLine().toUpperCase();
+            }
+            else {
+                boolean clientExists = false;
+                while (!clientExists) {
+                    name = sc.nextLine().toUpperCase();
+                    for (UserInfo client : clients) {
+                        if (!client.getName().equals(name)) {
+                            clientExists = true;
+                        } else {
+                            System.out.println(ANSI_RED + "------------ This user exists, please use a different name ------------------" + ANSI_RESET);
+                        }
+                    }
+                }
+            }
             System.out.println("Enter the urgency which the job requires (ASAP/SOON/WHENEVER): ");
             urgency = sc.nextLine().toUpperCase();
-            System.out.println("Enter the location which the job requires (AIR/SEA/LAND): ");
+            System.out.println("Enter the location which the job requires (LAND/SEA/AIR/SPACE): ");
             location = sc.nextLine().toUpperCase();
 
             System.out.println("\nThe details you entered are:\n");
             System.out.println("Name: " + name);
             System.out.println("Urgency: " + urgency);
             System.out.println("Location: " + location);
-            if ((urgency.equals("ASAP") || urgency.equals("SOON") || urgency.equals("WHENEVER")) && (location.equals("AIR") || location.equals("SEA") || location.equals("LAND"))) {
+            if ((urgency.equals("ASAP") || urgency.equals("SOON") || urgency.equals("WHENEVER")) && (location.equals("AIR") || location.equals("SPACE") || location.equals("SEA") || location.equals("LAND"))) {
                 System.out.println("\nAre you satisfied with the details entered? (Y) or (N).");
-                output = sc.nextLine().toUpperCase();
+                boolean correctInput = false;
+                while(!correctInput){
+                    output = sc.nextLine().toUpperCase();
+                    if (!(output.equals("Y") || output.equals("N"))){
+                        System.out.println(ANSI_RED+"----------------- Please type either Y or N -------------------"+ANSI_RESET);
+                    }
+                    else{
+                        correctInput=true;
+                    }
+                }
             } else {
                 output = "N";
-                System.out.println("\n*** One or more of the inputs given were wrong, try again please. ***\n");
+                System.out.println(ANSI_RED+"\n*** One or more of the inputs given were wrong, try again please. ***\n"+ANSI_RESET);
             }
         } while (output.equalsIgnoreCase("N"));
-        clients.add(new ClientInfo(name, urgency, location));
-        System.out.println("\n** New User Created Successfully! **");
+        clients.add(new UserInfo(name, urgency, location));
+        System.out.println(ANSI_BLUE+"\n** New User Created Successfully! **"+ANSI_RESET);
     }
 
 
-    public static void getQuotes(ClientInfo client) {
+    public static void getQuotes(UserInfo client) {
         int index = 1;
         RestTemplate restTemplate = new RestTemplate();
-        HttpEntity<ClientInfo> request = new HttpEntity<>(client);
-        ClientApplication clientApplication = restTemplate.postForObject("http://localhost:8083/applications", request, ClientApplication.class);
+        HttpEntity<UserInfo> request = new HttpEntity<>(client);
+        QuotationApplication clientApplication = restTemplate.postForObject("http://localhost:8083/applications", request, QuotationApplication.class);
         displayProfile(client);
 
         assert clientApplication != null;
@@ -127,7 +158,7 @@ public class Client {
 
     public static void getTracking() {
         Scanner sc = new Scanner(System.in);
-        System.out.println("\nEnter the assigned tracking number please: ");
+        System.out.println("\nEnter the assigned tracking number: ");
         String trackingNumber = sc.nextLine();
 
         RestTemplate restTemplate = new RestTemplate();
@@ -135,14 +166,17 @@ public class Client {
         TrackingApplication trackingApplication = restTemplate.postForObject("http://localhost:8085/applications", request, TrackingApplication.class);
         assert trackingApplication != null;
 
+        if(trackingApplication.getTracking().isEmpty()){
+            System.out.println(ANSI_RED +"\n---------------------- Tracking number ("+trackingNumber+") could not be found! --------------------------------"+ANSI_RESET);
+        }
         for (TrackingInfo tracking : trackingApplication.getTracking()) {
             if(tracking.getTrackingNumber()!=null) {
-                if(tracking.getDistance() != 0 && tracking.getTimeRemaining() != 0) {
-                    System.out.println("\n** Tracking Reference Found Successfully! **");
+                if(tracking.getDistance() > 0 && tracking.getTimeRemaining() > 0) {
+                    System.out.println(ANSI_BLUE+"\n** Tracking Reference Found Successfully! **"+ANSI_RESET);
                     displayTracking(tracking);
                 }
                 else{
-                    System.out.println("---------------------- Your order ("+tracking.getTrackingNumber()+") has arrived! --------------------------------");
+                    System.out.println(ANSI_GREEN +"\n---------------------- Your order ("+tracking.getTrackingNumber()+") has arrived! --------------------------------"+ANSI_RESET);
                 }
             }
         }
@@ -152,15 +186,32 @@ public class Client {
 
         RestTemplate restTemplate = new RestTemplate();
         Scanner sc = new Scanner(System.in);
-        System.out.println("\nEnter the quotation which you would like to order (E.g 1/2/3): ");
-        int chosenOrder = sc.nextInt();
+
+        int chosenOrder = 0;
+        boolean isQuote = false;
+        while(!isQuote) {
+            System.out.println("\nEnter the quotation which you would like to order (1/2/3/4): ");
+            while(!sc.hasNextInt()) {
+                sc.next();
+                System.out.println(ANSI_RED+"----------------- Quotation must be a number -------------------"+ANSI_RESET);
+            }
+            chosenOrder = sc.nextInt();
+            if(!cache.descendingKeySet().contains(chosenOrder)){
+                System.out.println(ANSI_RED+"----------------- Please choose a valid quote -------------------"+ANSI_RESET);
+            }
+            else{
+                isQuote=true;
+            }
+        }
+
+        System.out.println(cache.descendingKeySet());
 
         Quotation quote1 = cache.get(chosenOrder);
         HttpEntity<Quotation> request2 = new HttpEntity<>(quote1);
         OrderApplication orderApplication = restTemplate.postForObject("http://localhost:8084/applications", request2, OrderApplication.class);
 
         assert orderApplication != null;
-        System.out.println("\n** New Order Created Successfully! **");
+        System.out.println(ANSI_BLUE+"\n** New Order Created Successfully! **"+ANSI_RESET);
         for (Order order : orderApplication.getOrders()) {
             displayOrder(order);
         }
@@ -171,17 +222,20 @@ public class Client {
         System.out.println("|                                  Distributed Security Management Tracking Details                               |");
         System.out.println("|=================================================================================================================|");
         System.out.println("|                                     |                                     |                                     |");
-        System.out.println("| Distance: " + tracking.getDistance() + " Kilometers           | Tracking Number: " + tracking.getTrackingNumber() + "    | Time Remaining: "+  tracking.getTimeRemaining()+" seconds          |");
+        System.out.println(
+                "| Distance (KMs): " + String.format("%1$-20s", tracking.getDistance()) +
+                "| Urgency: " + String.format("%1$-27s", tracking.getTrackingNumber()) +
+                "| Time remaining (seconds): " + String.format("%1$-10s", tracking.getTimeRemaining())+"|");
         System.out.println("|                                     |                                     |                                     |");
         System.out.println("|=================================================================================================================|\n\n");
     }
 
 
-    public static void displayProfile(ClientInfo info) {
+    public static void displayProfile(UserInfo info) {
         System.out.println("|                                     |                                     |                                     |");
         System.out.println(
                 "| Name: " + String.format("%1$-29s", info.getName()) +
-                        " | Urgency: " + String.format("%1$-26s", (info.getUrgency())) +
+                        " | Tracking Number: " + String.format("%1$-18s", (info.getUrgency())) +
                         " | Location: " + String.format("%1$-25s", info.getLocation())+" |");
         System.out.println("|                                     |                                     |                                     |");
         System.out.println("|=================================================================================================================|");
@@ -213,7 +267,7 @@ public class Client {
         System.out.println("|                       |                                                    |                                    |");
         System.out.println(
                 "| Price: " + String.format("%1$-14s", NumberFormat.getCurrencyInstance().format(order.getPrice())) +
-                        " | Reference: " + String.format("%1$-30s", order.getReference()) +
+                        " | Reference: " + String.format("%1$-39s", order.getReference()) +
                         " | Tracking Number: " + String.format("%1$-17s", order.getTrackingNumber())+" |");
         System.out.println("|                       |                                                    |                                    |");
         System.out.println("|=================================================================================================================|\n\n");

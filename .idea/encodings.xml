@@ -4,8 +4,6 @@
     <file url="file://$PROJECT_DIR$/air/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/air/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/client/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/eureka-discovery/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/eureka-discovery/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ground/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ground/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ordering/src/main/java" charset="UTF-8" />
@@ -14,6 +12,7 @@
     <file url="file://$PROJECT_DIR$/quotations/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/sea/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/sea/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/space/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tracking/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tracking/src/main/resources" charset="UTF-8" />
   </component>

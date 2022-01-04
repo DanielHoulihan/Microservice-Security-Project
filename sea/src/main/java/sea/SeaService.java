@@ -1,6 +1,6 @@
 package sea;
 
-import info.ClientInfo;
+import info.UserInfo;
 import info.Order;
 import info.Quotation;
 import info.TrackingInfo;
@@ -12,6 +12,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.SecureRandom;
 import java.util.*;
 
 @RestController
@@ -19,39 +20,40 @@ public class SeaService {
     public static final String PREFIX = "SEA";
     public static final String COMPANY = "Navy Seals";
     private final ArrayList<TrackingInfo> trackings = new ArrayList<>();
+    private final Map<String, Quotation> quotations = new HashMap<>();
+    private final Map<String, Order> orders = new HashMap<>();
 
 
-    public Quotation generateQuotation(ClientInfo info) {
+    public Quotation generateQuotation(UserInfo info) {
         boolean possible = true;
-        double price = 5000;
+        double price = 50000;
         int urgency_charge = 0;
         if (info.getUrgency().equals("ASAP")){
-            urgency_charge = 4500;
+            urgency_charge = 22000;
         }
         else if (info.getUrgency().equals("SOON")){
-            urgency_charge = 2000;
+            urgency_charge = 13000;
         }
         if (!info.getLocation().equals("SEA")){
             possible = false;
         }
-        return new Quotation(COMPANY, generateReference(), (price + urgency_charge), possible);
+        return new Quotation(COMPANY, generateQuotationReference(), (price + urgency_charge), possible, info.getUrgency());
     }
 
-    int counter1 = 0;
-    protected String generateReference() {
+    int counter = 0;
+    protected String generateQuotationReference() {
         String ref = SeaService.PREFIX;
         int length = 100000;
         while (length > 1000) {
-            if (counter1 / length == 0) ref += "0";
+            if (counter / length == 0) ref += "0";
             length = length / 10;
         }
-        return ref + counter1++;
+        return ref + counter++;
     }
 
 
-    private Map<String, Quotation> quotations = new HashMap<>();
     @RequestMapping(value="/quotations",method= RequestMethod.POST)
-    public ResponseEntity<Quotation> createQuotation(@RequestBody ClientInfo info){
+    public ResponseEntity<Quotation> createQuotation(@RequestBody UserInfo info){
         Quotation quotation = generateQuotation(info);
         quotations.put(quotation.getReference(), quotation);
         String path = ServletUriComponentsBuilder.fromCurrentContextPath().
@@ -64,20 +66,14 @@ public class SeaService {
         return new ResponseEntity<>(quotation, headers, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value="/quotations/{reference}",method=RequestMethod.GET)
-    public Quotation getResource(@PathVariable("reference") String reference) {
-        Quotation quotation = quotations.get(reference);
-        if (quotation == null) throw new NoSuchQuotationException(); return quotation;
-    }
-
-    @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public class NoSuchQuotationException extends RuntimeException {
-        static final long serialVersionUID = -6516152229878843037L; }
-
-
     protected String generateOrderReference() {
         String ref = SeaService.PREFIX;
-        ref += UUID.randomUUID().toString();
+        String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        SecureRandom rnd = new SecureRandom();
+        StringBuilder sb = new StringBuilder(8);
+        for(int i = 0; i < 8; i++)
+            sb.append(AB.charAt(rnd.nextInt(AB.length())));
+        ref += sb.toString();
         return ref;
     }
 
@@ -93,11 +89,15 @@ public class SeaService {
         return ref + count2++;
     }
 
+    protected Order generateOrder(Quotation quote) {
+        String trackingNumber = generateTrackingNumber();
+        startTracking(trackingNumber, quote.getUrgency());
+        return new Order(generateOrderReference(), trackingNumber, quote.getPrice());
+    }
 
-    private Map<String, Order> orders = new HashMap<>();
     @RequestMapping(value="/ordering",method= RequestMethod.POST)
-    public ResponseEntity<Order> createOrder(@RequestBody Quotation quote, ClientInfo info){
-        Order order = generateOrder(info, quote);
+    public ResponseEntity<Order> createOrder(@RequestBody Quotation quote){
+        Order order = generateOrder(quote);
         orders.put(order.getReference(), order);
         String path = ServletUriComponentsBuilder.fromCurrentContextPath().
                 build().toUriString()+ "/ordering/"+order.getReference(); HttpHeaders headers = new HttpHeaders();
@@ -109,17 +109,21 @@ public class SeaService {
         return new ResponseEntity<>(order, headers, HttpStatus.CREATED);
     }
 
-
-    protected Order generateOrder(ClientInfo info, Quotation quote) {
-        String trackingNumber = generateTrackingNumber();
-        startTracking(trackingNumber);
-        return new Order(generateOrderReference(), trackingNumber, quote.getPrice());
-    }
-
-    protected void startTracking(String trackingNumber) {
+    protected void startTracking(String trackingNumber,String urgency) {
         Random r = new Random();
-        int time = r.nextInt(200-150) + 150;
-        int distance = time*5;
+
+        int time;
+        if(urgency.equals("ASAP")) {
+            time = r.nextInt(200 - 150) + 150;
+        }
+        else if(urgency.equals("SOON")){
+            time = r.nextInt(250 - 200) + 200;
+        }
+        else{
+            time = r.nextInt(350 - 300) + 300;
+        }
+
+        int distance = time*7;
 
         TrackingInfo info = new TrackingInfo(trackingNumber, distance, time);
         trackings.add(info);
@@ -128,8 +132,7 @@ public class SeaService {
 
             @Override
             public void run() {
-                int distanceReduction = r.nextInt(1000-500) + 500;
-                info.setDistance(info.getDistance()-5);
+                info.setDistance(info.getDistance()-7);
                 info.setTimeRemaining(info.getTimeRemaining()-1);
             }
         }, 0, 1000);
@@ -156,5 +159,40 @@ public class SeaService {
         return new ResponseEntity<>(infoToReturn, headers, HttpStatus.CREATED);
     }
 
+    @RequestMapping(value="/quotations/{reference}",method=RequestMethod.GET)
+    public Quotation getResourceQuoting(@PathVariable("reference") String reference) {
+        Quotation quotation = quotations.get(reference);
+        if (quotation == null) throw new NoSuchQuotationException();
+        return quotation;
+    }
+
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public static class NoSuchQuotationException extends RuntimeException {
+        static final long serialVersionUID = -6516152229878843037L;
+    }
+
+    @RequestMapping(value="/ordering/{reference}",method=RequestMethod.GET)
+    public Order getResourceOrdering(@PathVariable("reference") String reference) {
+        Order order = orders.get(reference);
+        if (order == null) throw new NoSuchOrderException();
+        return order;
+    }
+
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public static class NoSuchOrderException extends RuntimeException {
+        static final long serialVersionUID = -6516152229878843037L;
+    }
+
+    @RequestMapping(value="/tracking/{reference}",method=RequestMethod.GET)
+    public TrackingInfo getResourceTracking(@PathVariable("reference") int reference) {
+        TrackingInfo track = trackings.get(reference);
+        if (track == null) throw new NoSuchTrackingException();
+        return track;
+    }
+
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public static class NoSuchTrackingException extends RuntimeException {
+        static final long serialVersionUID = -6516152229878843037L;
+    }
 
 }

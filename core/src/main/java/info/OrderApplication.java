@@ -4,16 +4,16 @@ import java.util.ArrayList;
 
 public class OrderApplication implements java.io.Serializable{
 
-    public OrderApplication(long clientID, ClientInfo clientInfo, ArrayList<Order> orders){
+    public OrderApplication(long clientID, UserInfo userInfo, ArrayList<Order> orders){
         this.clientID = clientID;
-        this.clientInfo = clientInfo;
+        this.userInfo = userInfo;
         this.orders=orders;
     }
 
     public OrderApplication(){}
 
     private long clientID;
-    private ClientInfo clientInfo;
+    private UserInfo userInfo;
     private ArrayList<Order> orders = new ArrayList<>();
 
     public long getClientID() {
@@ -24,12 +24,12 @@ public class OrderApplication implements java.io.Serializable{
         this.clientID = clientID;
     }
 
-    public ClientInfo getClientInfo() {
-        return clientInfo;
+    public UserInfo getClientInfo() {
+        return userInfo;
     }
 
-    public void setClientInfo(ClientInfo clientInfo) {
-        this.clientInfo = clientInfo;
+    public void setClientInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
     }
 
     public void setOrders(ArrayList<Order> orders) {

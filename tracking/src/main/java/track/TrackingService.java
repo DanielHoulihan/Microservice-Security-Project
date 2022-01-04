@@ -23,6 +23,7 @@ public class TrackingService {
         trackingInfos.add(restTemplate.postForObject("http://air:8080/tracking", request, TrackingInfo.class));
         trackingInfos.add(restTemplate.postForObject("http://sea:8081/tracking", request, TrackingInfo.class));
         trackingInfos.add(restTemplate.postForObject("http://ground:8082/tracking", request, TrackingInfo.class));
+        trackingInfos.add(restTemplate.postForObject("http://space:8089/tracking", request, TrackingInfo.class));
 
         TrackingApplication trackingApplication = new TrackingApplication(trackingInfos);
         map.put(clientNumber, trackingApplication);

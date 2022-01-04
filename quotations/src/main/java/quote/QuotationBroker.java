@@ -1,7 +1,7 @@
 package quote;
 
-import info.ClientApplication;
-import info.ClientInfo;
+import info.QuotationApplication;
+import info.UserInfo;
 import info.Quotation;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -13,27 +13,28 @@ import java.util.HashMap;
 @RestController
 public class QuotationBroker {
 
-    public static HashMap<Integer, ClientApplication> map = new HashMap();
+    public static HashMap<Integer, QuotationApplication> map = new HashMap();
     public static int clientNumber = 0;
 
     @RequestMapping(value="/applications",method = RequestMethod.POST)
-    public ClientApplication getQuotations(@RequestBody ClientInfo info){
+    public QuotationApplication getQuotations(@RequestBody UserInfo info){
         RestTemplate restTemplate = new RestTemplate();
-        HttpEntity<ClientInfo> request = new HttpEntity<>(info);
+        HttpEntity<UserInfo> request = new HttpEntity<>(info);
         ArrayList<Quotation> quotations = new ArrayList<>();
 
         quotations.add(restTemplate.postForObject("http://air:8080/quotations", request, Quotation.class));
         quotations.add(restTemplate.postForObject("http://sea:8081/quotations", request, Quotation.class));
         quotations.add(restTemplate.postForObject("http://ground:8082/quotations", request, Quotation.class));
+        quotations.add(restTemplate.postForObject("http://space:8089/quotations", request, Quotation.class));
 
-        ClientApplication clientApplication = new ClientApplication(clientNumber, info, quotations);
-        map.put(clientNumber, clientApplication);
+        QuotationApplication quotationApplication = new QuotationApplication(clientNumber, info, quotations);
+        map.put(clientNumber, quotationApplication);
         clientNumber++;
-        return clientApplication;
+        return quotationApplication;
     }
 
     @RequestMapping(value="applications/{clientNumber}",method=RequestMethod.GET)
-    public ClientApplication getResource() {
+    public QuotationApplication getResource() {
         if (map == null) throw new NoSuchQuotationException(); return map.get(clientNumber);
     }
 
@@ -43,7 +44,7 @@ public class QuotationBroker {
     }
 
     @RequestMapping(value="/applications",method=RequestMethod.GET)
-    public ArrayList<ClientApplication> listApplications() {
+    public ArrayList<QuotationApplication> listApplications() {
         return new ArrayList<>(map.values());
     }
 }

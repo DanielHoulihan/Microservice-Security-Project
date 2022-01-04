@@ -15,6 +15,7 @@
     <module>ground</module>
     <module>tracking</module>
     <module>ordering</module>
+    <module>space</module>
 </modules>
 
 <properties>

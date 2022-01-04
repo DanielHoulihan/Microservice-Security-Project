@@ -1,6 +1,6 @@
 package ground;
 
-import info.ClientInfo;
+import info.UserInfo;
 import info.Order;
 import info.Quotation;
 import info.TrackingInfo;
@@ -12,6 +12,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.SecureRandom;
 import java.util.*;
 
 @RestController
@@ -19,22 +20,24 @@ public class GroundService {
     public static final String PREFIX = "GRD";
     public static final String COMPANY = "Army";
     private final ArrayList<TrackingInfo> trackings = new ArrayList<>();
+    private final Map<String, Quotation> quotations = new HashMap<>();
+    private final Map<String, Order> orders = new HashMap<>();
 
 
-    public Quotation generateQuotation(ClientInfo info) {
+    public Quotation generateQuotation(UserInfo info) {
         boolean possible = true;
-        double price = 100;
+        double price = 5000;
         int urgency_charge = 0;
         if (info.getUrgency().equals("ASAP")){
-            urgency_charge = 1000;
+            urgency_charge = 2500;
         }
         else if (info.getUrgency().equals("SOON")){
-            urgency_charge = 2000;
+            urgency_charge = 1000;
         }
         if (!info.getLocation().equals("LAND")){
             possible = false;
         }
-        return new Quotation(COMPANY, generateQuotationReference(), (price + urgency_charge), possible);
+        return new Quotation(COMPANY, generateQuotationReference(), (price + urgency_charge), possible, info.getUrgency());
     }
 
     int counter = 0;
@@ -49,9 +52,8 @@ public class GroundService {
     }
 
 
-    private Map<String, Quotation> quotations = new HashMap<>();
     @RequestMapping(value="/quotations",method= RequestMethod.POST)
-    public ResponseEntity<Quotation> createQuotation(@RequestBody ClientInfo info){
+    public ResponseEntity<Quotation> createQuotation(@RequestBody UserInfo info){
         Quotation quotation = generateQuotation(info);
         quotations.put(quotation.getReference(), quotation);
         String path = ServletUriComponentsBuilder.fromCurrentContextPath().
@@ -64,19 +66,14 @@ public class GroundService {
         return new ResponseEntity<>(quotation, headers, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value="/quotations/{reference}",method=RequestMethod.GET)
-    public Quotation getResource(@PathVariable("reference") String reference) {
-        Quotation quotation = quotations.get(reference);
-        if (quotation == null) throw new NoSuchQuotationException(); return quotation;
-    }
-
-    @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public class NoSuchQuotationException extends RuntimeException {
-        static final long serialVersionUID = -6516152229878843037L; }
-
     protected String generateOrderReference() {
         String ref = GroundService.PREFIX;
-        ref += UUID.randomUUID().toString();
+        String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        SecureRandom rnd = new SecureRandom();
+        StringBuilder sb = new StringBuilder(8);
+        for(int i = 0; i < 8; i++)
+            sb.append(AB.charAt(rnd.nextInt(AB.length())));
+        ref += sb.toString();
         return ref;
     }
 
@@ -92,10 +89,15 @@ public class GroundService {
         return ref + count2++;
     }
 
-    private Map<String, Order> orders = new HashMap<>();
+    protected Order generateOrder(Quotation quote) {
+        String trackingNumber = generateTrackingNumber();
+        startTracking(trackingNumber, quote.getUrgency());
+        return new Order(generateOrderReference(), trackingNumber, quote.getPrice());
+    }
+
     @RequestMapping(value="/ordering",method= RequestMethod.POST)
-    public ResponseEntity<Order> createOrder(@RequestBody Quotation quote, ClientInfo info) {
-        Order order = generateOrder(info, quote);
+    public ResponseEntity<Order> createOrder(@RequestBody Quotation quote) {
+        Order order = generateOrder(quote);
         orders.put(order.getReference(), order);
         String path = ServletUriComponentsBuilder.fromCurrentContextPath().
                 build().toUriString()+ "/ordering/"+order.getReference(); HttpHeaders headers = new HttpHeaders();
@@ -107,17 +109,19 @@ public class GroundService {
         return new ResponseEntity<>(order, headers, HttpStatus.CREATED);
     }
 
-
-    protected Order generateOrder(ClientInfo info, Quotation quote) {
-        String trackingNumber = generateTrackingNumber();
-        startTracking(trackingNumber);
-        return new Order(generateOrderReference(), trackingNumber, quote.getPrice());
-    }
-
-
-    protected void startTracking(String trackingNumber) {
+    protected void startTracking(String trackingNumber,String urgency) {
         Random r = new Random();
-        int time = r.nextInt(300-250) + 250;
+
+        int time;
+        if(urgency.equals("ASAP")) {
+            time = r.nextInt(300 - 250) + 250;
+        }
+        else if(urgency.equals("SOON")){
+            time = r.nextInt(350 - 300) + 300;
+        }
+        else{
+            time = r.nextInt(600 - 500) + 500;
+        }
         int distance = time*2;
 
         TrackingInfo info = new TrackingInfo(trackingNumber, distance, time);
@@ -152,6 +156,43 @@ public class GroundService {
             e.printStackTrace();
         }
         return new ResponseEntity<>(infoToReturn, headers, HttpStatus.CREATED);
+    }
+
+
+    @RequestMapping(value="/quotations/{reference}",method=RequestMethod.GET)
+    public Quotation getResourceQuoting(@PathVariable("reference") String reference) {
+        Quotation quotation = quotations.get(reference);
+        if (quotation == null) throw new NoSuchQuotationException();
+        return quotation;
+    }
+
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public static class NoSuchQuotationException extends RuntimeException {
+        static final long serialVersionUID = -6516152229878843037L;
+    }
+
+    @RequestMapping(value="/ordering/{reference}",method=RequestMethod.GET)
+    public Order getResourceOrdering(@PathVariable("reference") String reference) {
+        Order order = orders.get(reference);
+        if (order == null) throw new NoSuchOrderException();
+        return order;
+    }
+
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public static class NoSuchOrderException extends RuntimeException {
+        static final long serialVersionUID = -6516152229878843037L;
+    }
+
+    @RequestMapping(value="/tracking/{reference}",method=RequestMethod.GET)
+    public TrackingInfo getResourceTracking(@PathVariable("reference") int reference) {
+        TrackingInfo track = trackings.get(reference);
+        if (track == null) throw new NoSuchTrackingException();
+        return track;
+    }
+
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public static class NoSuchTrackingException extends RuntimeException {
+        static final long serialVersionUID = -6516152229878843037L;
     }
 
 }

@@ -14,6 +14,7 @@
         <module name="air" />
         <module name="tracking" />
         <module name="sea" />
+        <module name="space" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -30,6 +31,7 @@
       <module name="ordering" options="-parameters" />
       <module name="quotations" options="-parameters" />
       <module name="sea" options="-parameters" />
+      <module name="space" options="-parameters" />
       <module name="tracking" options="-parameters" />
     </option>
   </component>
