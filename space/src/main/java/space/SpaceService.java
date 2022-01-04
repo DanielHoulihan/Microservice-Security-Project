@@ -25,13 +25,13 @@ public class SpaceService {
 
 
     public Quotation generateQuotation(UserInfo info) {
-        double price = 150000000;
+        double price = 15000000;
         int urgency_charge = 0;
         if (info.getUrgency().equals("ASAP")){
-            urgency_charge = 100000000;
+            urgency_charge = 10000000;
         }
         else if (info.getUrgency().equals("SOON")){
-            urgency_charge = 50000000;
+            urgency_charge = 5000000;
         }
         return new Quotation(COMPANY, generateQuotationReference(), (price + urgency_charge), true, info.getUrgency());
     }
