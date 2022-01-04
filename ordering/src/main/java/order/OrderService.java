@@ -38,7 +38,7 @@ public class OrderService {
     }
 
     @RequestMapping(value="applications/{clientNumber}",method=RequestMethod.GET)
-    public OrderApplication getResourceOrdering() {
+    public OrderApplication getResource() {
         if (map == null) throw new NoSuchOrderException(); return map.get(clientNumber);
     }
 

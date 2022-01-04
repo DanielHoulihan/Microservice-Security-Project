@@ -38,13 +38,13 @@ public class SpaceService {
 
     int counter = 0;
     protected String generateQuotationReference() {
-        String ref = SpaceService.PREFIX;
+        StringBuilder ref = new StringBuilder(SpaceService.PREFIX);
         int length = 100000;
         while (length > 1000) {
-            if (counter / length == 0) ref += "0";
+            if (counter / length == 0) ref.append("0");
             length = length / 10;
         }
-        return ref + counter++;
+        return ref.toString() + counter++;
     }
 
 
@@ -75,14 +75,14 @@ public class SpaceService {
 
     int count2 = 1000;
     protected String generateTrackingNumber() {
-        String ref = SpaceService.PREFIX;
-        ref+="TRACK";
+        StringBuilder ref = new StringBuilder(SpaceService.PREFIX);
+        ref.append("TRACK");
         int length = 11111111;
         while (length > 1000) {
-            if (count2 / length == 0) ref += "0";
+            if (count2 / length == 0) ref.append("0");
             length = length / 10;
         }
-        return ref + count2++;
+        return ref.toString() + count2++;
     }
 
     protected Order generateOrder(Quotation quote) {

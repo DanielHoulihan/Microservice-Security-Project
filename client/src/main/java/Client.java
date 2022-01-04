@@ -10,12 +10,12 @@ import java.util.TreeMap;
 public class Client {
 
     private static final String ANSI_GREEN = "\u001B[32m";
+    private static final String ANSI_PURPLE = "\u001B[35m";
     private static final String ANSI_RED = "\u001B[31m";
     private static final String ANSI_BLUE = "\u001B[34m";
-    private static final String ANSI_YELLOW = "\u001B[33m";
     private static final String ANSI_RESET = "\u001B[0m";
     private static final ArrayList<UserInfo> clients = new ArrayList<>();
-    private static final TreeMap<Integer, Quotation> cache = new TreeMap<Integer, Quotation>();
+    private static final TreeMap<Integer, Quotation> cache = new TreeMap<>();
 
     public static void main(String[] args) {
 
@@ -76,20 +76,13 @@ public class Client {
         }
     }
 
-    public static void displayProfiles(ArrayList<UserInfo> info){
-        System.out.println("\n|=================================================================================================================|");
-        System.out.println("|                                  Distributed Security Management Client Profiles                                |");
-        System.out.println("|=================================================================================================================|");
-        for (UserInfo userInfo : info) {
-            displayProfile(userInfo);
-        }
-    }
+
 
     public static void createUser() {
         String output = "";
         String name = "";
-        String urgency = "";
-        String location = "";
+        String urgency;
+        String location;
         do {
             Scanner sc = new Scanner(System.in);
             System.out.println("\nEnter your name: ");
@@ -163,32 +156,6 @@ public class Client {
         }
     }
 
-    public static void getTracking() {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("\nEnter the assigned tracking number: ");
-        String trackingNumber = sc.nextLine();
-
-        RestTemplate restTemplate = new RestTemplate();
-        HttpEntity<String> request = new HttpEntity<>(trackingNumber);
-        TrackingApplication trackingApplication = restTemplate.postForObject("http://localhost:8085/applications", request, TrackingApplication.class);
-        assert trackingApplication != null;
-
-        if(trackingApplication.getTracking().isEmpty()){
-            System.out.println(ANSI_RED +"\n---------------------- Tracking number ("+trackingNumber+") could not be found! --------------------------------"+ANSI_RESET);
-        }
-        for (TrackingInfo tracking : trackingApplication.getTracking()) {
-            if(tracking.getTrackingNumber()!=null) {
-                if(tracking.getDistance() > 0 && tracking.getTimeRemaining() > 0) {
-                    System.out.println(ANSI_BLUE+"\n** Tracking Reference Found Successfully! **"+ANSI_RESET);
-                    displayTracking(tracking);
-                }
-                else{
-                    System.out.println(ANSI_GREEN +"\n---------------------- Your order ("+tracking.getTrackingNumber()+") has arrived! --------------------------------"+ANSI_RESET);
-                }
-            }
-        }
-    }
-
     public static void order() {
 
         RestTemplate restTemplate = new RestTemplate();
@@ -224,11 +191,52 @@ public class Client {
         }
     }
 
+    public static void getTracking() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("\nEnter the assigned tracking number: ");
+        String trackingNumber = sc.nextLine();
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<String> request = new HttpEntity<>(trackingNumber);
+        TrackingApplication trackingApplication = restTemplate.postForObject("http://localhost:8085/applications", request, TrackingApplication.class);
+        assert trackingApplication != null;
+
+        if(trackingApplication.getTracking().isEmpty()){
+            System.out.println(ANSI_RED +"\n---------------------- Tracking number ("+trackingNumber+") could not be found! --------------------------------"+ANSI_RESET);
+        }
+        for (TrackingInfo tracking : trackingApplication.getTracking()) {
+            if(tracking.getTrackingNumber()!=null) {
+                if(tracking.getDistance() > 0 && tracking.getTimeRemaining() > 0) {
+                    System.out.println(ANSI_BLUE+"\n** Tracking Reference Found Successfully! **"+ANSI_RESET);
+                    displayTracking(tracking);
+                }
+                else{
+                    printArrived(tracking.getTrackingNumber());
+                }
+            }
+        }
+    }
+
+    public static void printArrived(String trackingNumber){
+        System.out.println(ANSI_GREEN+"\n|=================================================================================================================|"+ANSI_RESET);
+        System.out.println(ANSI_GREEN+"|                                  Your order ("+trackingNumber+") has arrived!                                    |"+ANSI_RESET);
+        System.out.println(ANSI_GREEN+"|=================================================================================================================|"+ANSI_RESET);
+    }
+
     public static void killApp() {
-        System.out.println(ANSI_BLUE+"\n\nThank you for using Distributed Security Management!"+ANSI_RESET);
-        System.out.println(ANSI_BLUE+"We look forward to seeing you again soon!"+ANSI_RESET);
+        System.out.println(ANSI_PURPLE+"\n\nThank you for using Distributed Security Management!"+ANSI_RESET);
+        System.out.println(ANSI_PURPLE+"We look forward to seeing you again soon!"+ANSI_RESET);
         displayLogo();
         System.exit(0);
+    }
+
+    public static void displayProfiles(ArrayList<UserInfo> info){
+        System.out.println("\n|=================================================================================================================|");
+        System.out.println("|                                  Distributed Security Management Client Profiles                                |");
+        System.out.println("|=================================================================================================================|");
+        for (UserInfo userInfo : info) {
+            displayProfile(userInfo);
+        }
     }
 
     public static void displayTracking(TrackingInfo tracking) {
@@ -238,7 +246,7 @@ public class Client {
         System.out.println("|                                     |                                     |                                     |");
         System.out.println(
                 "| Distance (KMs): " + String.format("%1$-20s", tracking.getDistance()) +
-                "| Urgency: " + String.format("%1$-27s", tracking.getTrackingNumber()) +
+                "| Tracking number: " + String.format("%1$-19s", tracking.getTrackingNumber()) +
                 "| Time remaining (seconds): " + String.format("%1$-10s", tracking.getTimeRemaining())+"|");
         System.out.println("|                                     |                                     |                                     |");
         System.out.println("|=================================================================================================================|\n\n");
@@ -295,12 +303,16 @@ public class Client {
     }
 
     public static void displayLogo() {
-        System.out.println(ANSI_RED + "\n\n ______      ______    ____    ____  " + ANSI_RESET);
-        System.out.println(ANSI_RED + "|_   _ `.  .' ____ \\  |_   \\  /   _| " + ANSI_RESET);
-        System.out.println(ANSI_BLUE + "  | | `. \\ | (___ \\_|   |   \\/   |   " + ANSI_RESET);
-        System.out.println(ANSI_BLUE + "  | |  | |  _.____`.    | |\\  /| |   " + ANSI_RESET);
-        System.out.println(ANSI_GREEN + " _| |_.' / | \\____) |  _| |_\\/_| |_  " + ANSI_RESET);
-        System.out.println(ANSI_GREEN + "|______.'   \\______.' |_____||_____| \n\n" + ANSI_RESET);
+        System.out.println(ANSI_RED + "\n\n ______    "+ANSI_BLUE+"  ______    "+ANSI_GREEN+"____    ____  " + ANSI_RESET);
+        System.out.println(ANSI_RED + "|_   _ `.  "+ANSI_BLUE+".' ____ \\  "+ANSI_GREEN+"|_   \\  /   _| " + ANSI_RESET);
+        System.out.println(ANSI_RED + "  | | `. \\"+ANSI_BLUE+" | (___ \\_|"+ANSI_GREEN+"   |   \\/   |   " + ANSI_RESET);
+        System.out.println(ANSI_RED + "  | |  | | "+ANSI_BLUE+" _.____`.   "+ANSI_GREEN+" | |\\  /| |   " + ANSI_RESET);
+        System.out.println(ANSI_RED + " _| |_.' / "+ANSI_BLUE+"| \\____) | "+ANSI_GREEN+" _| |_\\/_| |_  " + ANSI_RESET);
+        System.out.println(ANSI_RED + "|______.'  "+ANSI_BLUE+" \\______.' "+ANSI_GREEN+"|_____||_____| " + ANSI_RESET);
+        System.out.println(ANSI_PURPLE + "------------------------------------\n\n" + ANSI_RESET);
     }
+
+
+
 }
 

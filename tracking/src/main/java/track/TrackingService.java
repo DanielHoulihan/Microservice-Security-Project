@@ -36,7 +36,7 @@ public class TrackingService {
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public class NoSuchTrackingException extends RuntimeException {
+    public static class NoSuchTrackingException extends RuntimeException {
         static final long serialVersionUID = -6516152229878843037L;
     }
 
