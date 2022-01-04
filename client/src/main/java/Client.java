@@ -257,7 +257,7 @@ public class Client {
         System.out.println("|                                     |                                     |                                     |");
         System.out.println(
                 "| Name: " + String.format("%1$-29s", info.getName()) +
-                        " | Tracking Number: " + String.format("%1$-18s", (info.getUrgency())) +
+                        " | Urgency: " + String.format("%1$-26s", (info.getUrgency())) +
                         " | Location: " + String.format("%1$-25s", info.getLocation())+" |");
         System.out.println("|                                     |                                     |                                     |");
         System.out.println("|=================================================================================================================|");
