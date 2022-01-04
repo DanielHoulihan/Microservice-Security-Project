@@ -24,7 +24,7 @@ public class AirService {
     private final Map<String, Quotation> quotations = new HashMap<>();
 
     public Quotation generateQuotation(UserInfo info) {
-        boolean possible = true;
+        boolean possible = !info.getLocation().equals("SPACE");
         double price = 100000;
         int urgency_charge = 0;
         if (info.getUrgency().equals("ASAP")){

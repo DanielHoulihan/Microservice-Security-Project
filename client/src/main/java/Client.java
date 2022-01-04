@@ -47,20 +47,23 @@ public class Client {
                     for (UserInfo client : clients) {
                         System.out.println("-> " + client.getName());
                     }
+                    
+                    UserInfo clientToUse = null;
                     boolean clientExists=false;
                     while(!clientExists) {
                         String user = sc.nextLine().toUpperCase();
                         for (UserInfo client : clients) {
                             if (client.getName().equals(user)) {
                                 clientExists = true;
-                                getQuotes(client);
-                                //break;
-                            }
-                            else {
-                                System.out.println(ANSI_RED + "------------- Please enter a valid name -------------" + ANSI_RESET);
+                                clientToUse=client;
+                                break;
                             }
                         }
+                        if(!clientExists){
+                            System.out.println(ANSI_RED + "------------- Please enter a valid name -------------" + ANSI_RESET);
+                        }
                     }
+                    getQuotes(clientToUse);
                     order();
                 } else {
                     check = "N";
