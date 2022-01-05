@@ -34,13 +34,16 @@ public class Client {
                 Scanner sc = new Scanner(System.in);
                 String input = sc.nextLine().toUpperCase();
 
+                if((input.equals("ORDER") || input.equals("TRACK")) && clients.isEmpty()){
+                    System.out.println(ANSI_RED+"\n------------------ No users exist, you must create one first ---------------------"+ANSI_RESET);
+                    continue;
+                }
+
                 if (input.equals("CREATE")) {
                     createUser();
                     displayProfiles(clients);
                 } else if (clients.isEmpty() && !input.equals("QUIT")) {
                     System.out.println(ANSI_RED+"\n------------------ No users exist, you must create one first ---------------------"+ANSI_RESET);
-                    createUser();
-                    displayProfiles(clients);
                 } else if (input.equals("TRACK")) {
                     getTracking();
                 } else if (input.equals("ORDER")) {
@@ -57,6 +60,7 @@ public class Client {
                             if (client.getName().equals(user)) {
                                 clientExists = true;
                                 clientToUse=client;
+                                getQuotes(clientToUse);
                                 break;
                             }
                         }
@@ -64,7 +68,7 @@ public class Client {
                             System.out.println(ANSI_RED + "------------- Please enter a valid name -------------" + ANSI_RESET);
                         }
                     }
-                    getQuotes(clientToUse);
+//                    getQuotes(clientToUse);
                     order();
                 } else if(input.equals("QUIT")) {
                     killApp();
